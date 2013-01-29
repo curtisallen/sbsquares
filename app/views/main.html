@@ -1,0 +1,16 @@
+<div class="hero-unit">
+  <h1>Welcome to Super Bowl Squares!</h1>
+  <p class="lead">Use this app to manage your superbowl squares pools for free.
+  Don't know how to play superbowl squares? It's pretty easy check out a explantion <a href="http://www.footballsquares.net/pages/help">here</a></p>
+  <p>This app will help you organize your superbowl squares group and keep track of who paid</p>
+  <h3>Lets get started!</h3>
+  <form class="form-inline">
+  	<input type="text" class="" placeholder="Group Id" ng-model="groupId">
+  	<input type="password" class="" placeholder="Password" ng-model="password">
+  	<button type="submit" class="btn btn-primary" ng-click="login()">Login</button>
+  	<button type="submit" class="btn btn-primary" ng-click="createGroup()">Sign Up</button>
+  </form>
+  <div ng-show="error.show">
+  	<span class="label label-important">{{error.msg}}</span>
+  </div>
+</div>

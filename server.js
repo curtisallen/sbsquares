@@ -2,7 +2,9 @@
 //  OpenShift sample Node application
 var express = require('express');
 var fs      = require('fs');
-
+var _       = require('underscore');
+var mongodb = require('mongodb');
+var mongoose = require('./db').getMongoose();
 
 /**
  *  Define the sample application.
@@ -12,6 +14,27 @@ var SampleApp = function() {
     //  Scope.
     var self = this;
 
+
+    // Setup
+    var MONGODB_DB_HOST = process.env.OPENSHIFT_MONGODB_DB_HOST || 'localhost';
+    var MONGODB_DB_PORT = process.env.OPENSHIFT_MONGODB_DB_PORT || 27017;
+    var MONGODB_DB_USERNAME = process.env.OPENSHIFT_MONGODB_DB_USERNAME || '';
+    var MONGODB_DB_PASSWORD = process.env.OPENSHIFT_MONGODB_DB_PASSWORD || '';
+    var IP = process.env.OPENSHIFT_INTERNAL_IP || '127.0.0.1';
+
+    var Group = mongoose.model('Group');
+    var User = mongoose.model('User');
+
+    /*self.dbServer = new mongodb.Server(MONGODB_DB_HOST,parseInt(MONGODB_DB_PORT));
+    self.db = new mongodb.Db('sbsquares', self.dbServer, {auto_reconnect: true, journal: false});
+    self.dbUser = MONGODB_DB_USERNAME;
+    self.dbPass = MONGODB_DB_PASSWORD;
+    */
+    self.ipaddr  = IP;
+    self.port    = parseInt(process.env.OPENSHIFT_INTERNAL_PORT) || 3501;
+    if (typeof self.ipaddr === "undefined") {
+        console.warn('No OPENSHIFT_INTERNAL_IP environment variable');
+    };
 
     /*  ================================================================  */
     /*  Helper functions.                                                 */
@@ -23,7 +46,7 @@ var SampleApp = function() {
     self.setupVariables = function() {
         //  Set the environment variables we need.
         self.ipaddress = process.env.OPENSHIFT_INTERNAL_IP;
-        self.port      = process.env.OPENSHIFT_INTERNAL_PORT || 8080;
+        self.port      = process.env.OPENSHIFT_INTERNAL_PORT || 3501;
 
         if (typeof self.ipaddress === "undefined") {
             //  Log errors on OpenShift but continue w/ 127.0.0.1 - this
@@ -43,7 +66,7 @@ var SampleApp = function() {
         }
 
         //  Local cache for static content.
-        self.zcache['index.html'] = fs.readFileSync('./index.html');
+        //self.zcache['index.html'] = fs.readFileSync('./index.html');
     };
 
 
@@ -95,20 +118,97 @@ var SampleApp = function() {
     self.createRoutes = function() {
         self.routes = { };
 
-        // Routes for /health, /asciimo and /
-        self.routes['/health'] = function(req, res) {
-            res.send('1');
-        };
-
-        self.routes['/asciimo'] = function(req, res) {
-            var link = "http://i.imgur.com/kmbjB.png";
-            res.send("<html><body><img src='" + link + "'></body></html>");
-        };
-
         self.routes['/'] = function(req, res) {
             res.setHeader('Content-Type', 'text/html');
             res.send(self.cache_get('index.html') );
         };
+
+        self.routes['login'] = function(req, res) {
+            console.log("loggin in");
+            Group.findOne({groupId: req.body.groupId, password: req.body.password})
+            .exec(function(err, group) {
+                res.setHeader('Content-Type', 'application/json');
+                var body = {};
+                if(group) {
+                    body.success = true;
+                    res.setHeader('Content-Length', body.length);
+                    res.json(body);
+                } else {
+                    var msg = "Invalid group id / password";
+                    console.log(msg);
+                    body.success = false;
+                    body.message = msg;
+                    res.setHeader('Content-Length', body.length);
+                    res.json(500, body);
+                }
+            });
+        };
+        self.routes['createGroup'] = function(req, res) {
+            console.log("creating group" + req.body);
+            var groupInstance = new Group();
+            groupInstance.groupId = req.body.groupId;
+            groupInstance.password = req.body.password;
+
+            // make sure there isn't any other groups with this id before saving
+            /*Group.find({groupId: groupInstance.groupId}, function(err, docs) {
+                console.log("error" + err);
+                console.log("docs " + docs);
+
+            });*/
+            console.log(groupInstance);
+
+            Group.findOne({groupId: groupInstance.groupId}).exec(function(err, group) {
+                res.setHeader('Content-Type', 'application/json');
+                var body = {};
+                if (err) {
+                    var msg = "Error searching...";
+                    console.log(msg);
+                    body.success = false;
+                    body.message = msg;
+                    res.setHeader('Content-Length', body.length);
+                    res.json(500, body);
+                }
+                if(group) {
+                    // this group id exists send error
+                    var msg = "Group id already exists... ";
+                    console.log(msg);
+                    body.success = false;
+                    body.message = msg;
+                    res.setHeader('Content-Length', body.length);
+                    res.json(500, body);
+                } else {
+                    // we can save it
+                    groupInstance.save();
+                    body.success = true;
+                    res.setHeader('Content-Length', body.length);
+                    res.json(body);
+                }
+
+            });
+        };
+
+        self.routes['getGroup'] = function(req, res) {
+            console.log("Looking for this group id " + req.params.groupId);
+            Group.findOne({groupId: req.params.groupId}).exec(function(err, group) {
+                if(err) {
+                    var msg = "Invalid group id...";
+                    console.log(msg);
+                    var body = {};
+                    body.success = false;
+                    body.message = msg;
+                    res.setHeader('Content-Length', body.length);
+                    res.json(500, body);
+                } else {
+                    //console.log("group: " + group);
+                    res.json(group);
+                }
+
+            });
+        };
+
+        self.routes['checkEmail'] = function(req, res) {
+            //Group.findOne({groupId})
+        }
     };
 
 
@@ -118,12 +218,24 @@ var SampleApp = function() {
      */
     self.initializeServer = function() {
         self.createRoutes();
-        self.app = express.createServer();
+        self.app = express();
 
         //  Add handlers for the app (from the routes).
-        for (var r in self.routes) {
-            self.app.get(r, self.routes[r]);
-        }
+        // for (var r in self.routes) {
+        //     self.app.get(r, self.routes[r]);
+        // }
+        // server static content 
+        self.app.use(express.static(__dirname + '/app'));
+        self.app.use(express.static(__dirname + '/components'));
+        // conf
+        self.app.use(express.bodyParser());
+        self.app.use(express.cookieParser());
+        self.app.use(express.session({secret: '4265d78bcf30e9f7f9d3963adf982699'}));
+        // routes
+        self.app.get('/', self.routes['/']);
+        self.app.post('/createGroup', self.routes['createGroup']);
+        self.app.post('/login', self.routes['login']);
+        self.app.get('/group/:groupId', self.routes['getGroup']);
     };
 
 

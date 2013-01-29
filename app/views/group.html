@@ -1,0 +1,20 @@
+<div class="hero-unit" ng-init="init()">
+	<h2>
+		Group: {{group.groupId}}
+		<small>password: {{group.password}}</small>
+	</h2>
+</div>
+<p>{{group}}</p>
+
+<div>
+	<form ng-hide="showUserInfo" class="form-inline">
+		What's your email? 
+		<input type="email" ng-model="email">
+		<button type="submit" class="btn btn-primary" ng-click="userEmail()">Submit</button>
+	</form>
+	<form ng-show="showUserInfo" class="form-inline">
+		What's your name?
+		<input type="text" ng-model="name">
+		<button type="submit" class="btn btn-primary" ng-click="saveUser()">Save</button>
+	</form>
+</div>
