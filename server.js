@@ -152,8 +152,8 @@ var SampleApp = function() {
         self.routes['createGroup'] = function(req, res) {
             console.log("creating group" + req.body);
             var groupInstance = new Group();
-            for(var i = 0; i < 9; i++){
-                for(var j = 0; j < 9; j++){
+            for(var i = 0; i <= 9; i++){
+                for(var j = 0; j <= 9; j++){
                     var square = new Square();
                     square.x = i;
                     square.y = j;
