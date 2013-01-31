@@ -8,11 +8,11 @@
 <div>
     <div>Name: <input data-ng-change="calculateSquares()" data-ng-model="name" style="width:100px" type="text" placeholder="Insert Name"> Email: <input data-ng-change="calculateSquares()" data-ng-model="email" style="width:150px" type="text" placeholder="Insert Email"></div>
     <br />
-    Squares Taken : {{squaresCounts}}  Cost: ${{squaresCost}}
+    Squares Taken : {{squaresCount}}  Cost: ${{squaresCost}} <button data-ng-click="submitSquares()" class="btn btn-info">Submit</button>
 </div>
 <div id="squares">
     <ul class="unstyled">
-        <li data-ng-click="squareClick(square)" data-ng-repeat="square in group.squares" class="square"><span>{{minimizedName(square.owner.name)}}</span></li>
+        <li data-ng-click="squareClick(square)" data-ng-repeat="square in group.squares" class="square"><span>{{minimizedName(square)}}</span></li>
     </ul>
 </div>
 

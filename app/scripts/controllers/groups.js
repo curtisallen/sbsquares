@@ -18,10 +18,11 @@ sbsquaresApp.controller('GroupsCtrl', function($scope, $http, $location, $log) {
                 .success(function(data, status, headers, config) {
             //$log.log("Received group info: " + angular.toJson(data));
             $scope.group = data;
+            $log.log("square 0" + angular.toJson($scope.group.squares[0]));
             // if there are no admins create one
-			if(_.isUndefined($scope.group.adminPassword)) {
-				$('#adminPanel').modal('show');
-			}
+            if (_.isUndefined($scope.group.adminPassword)) {
+                $('#adminPanel').modal('show');
+            }
             //$log.log("group: " + angular.toJson($scope.group));
         }).error(function(data, status, headers, config) {
             // redirect becuase there is no session
@@ -50,10 +51,15 @@ sbsquaresApp.controller('GroupsCtrl', function($scope, $http, $location, $log) {
         $scope.squaresCost = numSquares * $scope.group.cost;
     }
 
-    $scope.minimizedName = function(name) {
-        if (name == null) {
+    $scope.minimizedName = function(square) {
+        if (square.owner == null || square.owner.length == 0) {
+            return;
+        }
+        var name = square.owner[0].name;
+        if (name == null | name === "") {
             return "";
         }
+        $log.log("min name called");
         if (name.length > 12) {
             return name.substring(0, 8) + "...";
         } else {
@@ -72,27 +78,63 @@ sbsquaresApp.controller('GroupsCtrl', function($scope, $http, $location, $log) {
         }
         if (square.owner == null || square.owner.name == null) {
             $log.log("adding name to square");
-            square.owner = {name: $scope.name, email: $scope.email};
+            square.owner = [{name: $scope.name, email: $scope.email}];
             $scope.squaresCount = $scope.squaresCount + 1;
             $scope.squaresCost = $scope.squaresCount * $scope.group.cost;
         } else {
-            if (square.owner.name === $scope.name && square.owner.email === $scope.email) {
-                square.owner = {};
-                $scope.squaresCount = $scope.squaresCount - 1;
-                $scope.squaresCost = $scope.squaresCount * $scope.group.cost;
+            if (square.owner != null && square.owner.length > 0) {
+                if (square.owner[0].name === $scope.name && square.owner[0].email === $scope.email) {
+                    square.owner = {};
+                    $scope.squaresCount = $scope.squaresCount - 1;
+                    $scope.squaresCost = $scope.squaresCount * $scope.group.cost;
+
+                }
 
             }
         }
     }
 
+    $scope.submitSquares = function() {
+        $http.post("/updateGroup", $scope.group).success(function(data, status, headers, config) {
+            $http.get($location.url())
+                    .success(function(data, status, headers, config) {
+                //$log.log("Received group info: " + angular.toJson(data));
+                $scope.group = data;
+                // if there are no admins create one
+                if (_.isUndefined($scope.group.adminPassword)) {
+                    $('#adminPanel').modal('show');
+                }
+                //$log.log("group: " + angular.toJson($scope.group));
+            }).error(function(data, status, headers, config) {
+                // redirect becuase there is no session
+                $location.url('/');
+            });
+        }).error(function(data, status, headers, config) {
+
+        });
+    }
+
     $scope.saveAdmin = function() {
         $http.post('/saveAdmin', {cost: $scope.cost, adminPassword: $scope.adminPassword})
-        	.success(function(data, status, headers, config) {
-        		$('#adminPanel').modal('hide');
-        	})
-            .error(function(data, status, headers, config) {
-        		$log.log("Couldn't save admin info!");
-        		$location.url('/');
+                .success(function(data, status, headers, config) {
+            $http.get($location.url())
+                    .success(function(data, status, headers, config) {
+                //$log.log("Received group info: " + angular.toJson(data));
+                $scope.group = data;
+                // if there are no admins create one
+                if (_.isUndefined($scope.group.adminPassword)) {
+                    $('#adminPanel').modal('show');
+                }
+                //$log.log("group: " + angular.toJson($scope.group));
+            }).error(function(data, status, headers, config) {
+                // redirect becuase there is no session
+                $location.url('/');
+            });
+            $('#adminPanel').modal('hide');
+        })
+                .error(function(data, status, headers, config) {
+            $log.log("Couldn't save admin info!");
+            $location.url('/');
         });
     };
 });

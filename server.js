@@ -1,8 +1,8 @@
 #!/bin/env node
 //  OpenShift sample Node application
-var express = require('express');
-var fs      = require('fs');
-var _       = require('underscore');
+        var express = require('express');
+var fs = require('fs');
+var _ = require('underscore');
 var mongodb = require('mongodb');
 var mongoose = require('./db').getMongoose();
 
@@ -20,6 +20,7 @@ var SampleApp = function() {
     var MONGODB_DB_PORT = process.env.OPENSHIFT_MONGODB_DB_PORT || 27017;
     var MONGODB_DB_USERNAME = process.env.OPENSHIFT_MONGODB_DB_USERNAME || '';
     var MONGODB_DB_PASSWORD = process.env.OPENSHIFT_MONGODB_DB_PASSWORD || '';
+    var MONGODB_DB_NAME = "sbsquares";
     var IP = process.env.OPENSHIFT_INTERNAL_IP || '127.0.0.1';
 
     var Group = mongoose.model('Group');
@@ -27,15 +28,16 @@ var SampleApp = function() {
     var Square = mongoose.model('Square');
 
     /*self.dbServer = new mongodb.Server(MONGODB_DB_HOST,parseInt(MONGODB_DB_PORT));
-    self.db = new mongodb.Db('sbsquares', self.dbServer, {auto_reconnect: true, journal: false});
-    self.dbUser = MONGODB_DB_USERNAME;
-    self.dbPass = MONGODB_DB_PASSWORD;
-    */
-    self.ipaddr  = IP;
-    self.port    = parseInt(process.env.OPENSHIFT_INTERNAL_PORT) || 3501;
+     self.db = new mongodb.Db('sbsquares', self.dbServer, {auto_reconnect: true, journal: false});
+     self.dbUser = MONGODB_DB_USERNAME;
+     self.dbPass = MONGODB_DB_PASSWORD;
+     */
+    self.ipaddr = IP;
+    self.port = parseInt(process.env.OPENSHIFT_INTERNAL_PORT) || 3501;
     if (typeof self.ipaddr === "undefined") {
         console.warn('No OPENSHIFT_INTERNAL_IP environment variable');
-    };
+    }
+    ;
 
     /*  ================================================================  */
     /*  Helper functions.                                                 */
@@ -47,14 +49,15 @@ var SampleApp = function() {
     self.setupVariables = function() {
         //  Set the environment variables we need.
         self.ipaddress = process.env.OPENSHIFT_INTERNAL_IP;
-        self.port      = process.env.OPENSHIFT_INTERNAL_PORT || 3501;
+        self.port = process.env.OPENSHIFT_INTERNAL_PORT || 3501;
 
         if (typeof self.ipaddress === "undefined") {
             //  Log errors on OpenShift but continue w/ 127.0.0.1 - this
             //  allows us to run/test the app locally.
             console.warn('No OPENSHIFT_INTERNAL_IP var, using 127.0.0.1');
             self.ipaddress = "127.0.0.1";
-        };
+        }
+        ;
     };
 
 
@@ -63,7 +66,7 @@ var SampleApp = function() {
      */
     self.populateCache = function() {
         if (typeof self.zcache === "undefined") {
-            self.zcache = { 'index.html': '' };
+            self.zcache = { 'index.html': ''};
         }
 
         //  Local cache for static content.
@@ -75,7 +78,9 @@ var SampleApp = function() {
      *  Retrieve entry (content) from cache.
      *  @param {string} key  Key identifying content to retrieve from cache.
      */
-    self.cache_get = function(key) { return self.zcache[key]; };
+    self.cache_get = function(key) {
+        return self.zcache[key];
+    };
 
 
     /**
@@ -83,28 +88,32 @@ var SampleApp = function() {
      *  Terminate server on receipt of the specified signal.
      *  @param {string} sig  Signal to terminate on.
      */
-    self.terminator = function(sig){
+    self.terminator = function(sig) {
         if (typeof sig === "string") {
-           console.log('%s: Received %s - terminating sample app ...',
-                       Date(Date.now()), sig);
-           process.exit(1);
+            console.log('%s: Received %s - terminating sample app ...',
+                    Date(Date.now()), sig);
+            process.exit(1);
         }
-        console.log('%s: Node server stopped.', Date(Date.now()) );
+        console.log('%s: Node server stopped.', Date(Date.now()));
     };
 
 
     /**
      *  Setup termination handlers (for exit and a list of signals).
      */
-    self.setupTerminationHandlers = function(){
+    self.setupTerminationHandlers = function() {
         //  Process on exit and signals.
-        process.on('exit', function() { self.terminator(); });
+        process.on('exit', function() {
+            self.terminator();
+        });
 
         // Removed 'SIGPIPE' from the list - bugz 852598.
         ['SIGHUP', 'SIGINT', 'SIGQUIT', 'SIGILL', 'SIGTRAP', 'SIGABRT',
-         'SIGBUS', 'SIGFPE', 'SIGUSR1', 'SIGSEGV', 'SIGUSR2', 'SIGTERM'
-        ].forEach(function(element, index, array) {
-            process.on(element, function() { self.terminator(element); });
+            'SIGBUS', 'SIGFPE', 'SIGUSR1', 'SIGSEGV', 'SIGUSR2', 'SIGTERM'
+                ].forEach(function(element, index, array) {
+            process.on(element, function() {
+                self.terminator(element);
+            });
         });
     };
 
@@ -121,17 +130,17 @@ var SampleApp = function() {
 
         self.routes['/'] = function(req, res) {
             res.setHeader('Content-Type', 'text/html');
-            res.send(self.cache_get('index.html') );
+            res.send(self.cache_get('index.html'));
         };
 
         self.routes['login'] = function(req, res) {
             console.log("loggin in");
 
             Group.findOne({groupId: req.body.groupId, password: req.body.password})
-            .exec(function(err, group) {
+                    .exec(function(err, group) {
                 res.setHeader('Content-Type', 'application/json');
                 var body = {};
-                if(group) {
+                if (group) {
                     // save session var
                     req.session.gid = req.body.groupId;
                     body.success = true;
@@ -152,8 +161,8 @@ var SampleApp = function() {
         self.routes['createGroup'] = function(req, res) {
             console.log("creating group" + req.body);
             var groupInstance = new Group();
-            for(var i = 0; i <= 9; i++){
-                for(var j = 0; j <= 9; j++){
+            for (var i = 0; i <= 9; i++) {
+                for (var j = 0; j <= 9; j++) {
                     var square = new Square();
                     square.x = i;
                     square.y = j;
@@ -179,7 +188,7 @@ var SampleApp = function() {
                     res.setHeader('Content-Length', body.length);
                     res.json(500, body);
                 }
-                if(group) {
+                if (group) {
                     // clear session
                     req.session = null;
                     // this group id exists send error
@@ -205,14 +214,14 @@ var SampleApp = function() {
         self.routes['getGroup'] = function(req, res) {
             console.log("Looking for this group id " + req.params.groupId);
             console.log("cookie: " + JSON.stringify(req.session));
-            if(_.isUndefined(req.session.gid)) {
+            if (_.isUndefined(req.session.gid)) {
                 var msg = "Login before you continue";
                 var body = {success: false, message: msg};
                 res.setHeader('Content-Length', body.length);
                 res.json(401, body);
             }
             Group.findOne({groupId: req.params.groupId}).exec(function(err, group) {
-                if(err) {
+                if (err) {
                     var msg = "Invalid group id...";
                     console.log(msg);
                     var body = {};
@@ -230,7 +239,7 @@ var SampleApp = function() {
 
         self.routes['saveAdmin'] = function(req, res) {
             // save admin for this 
-            if(_.isUndefined(req.session.gid)) {
+            if (_.isUndefined(req.session.gid)) {
                 var msg = "Login before you continue";
                 var body = {success: false, message: msg};
                 res.setHeader('Content-Length', body.length);
@@ -248,21 +257,58 @@ var SampleApp = function() {
         };
 
         self.routes['updateGroup'] = function(req, res) {
-            if(_.isUndefined(req.session.gid)) {
+            if (_.isUndefined(req.session.gid)) {
                 var msg = "Login before you continue";
                 var body = {success: false, message: msg};
                 res.setHeader('Content-Length', body.length);
                 res.json(401, body);
             }
+            delete req.body["_id"];
             console.log("updating " + req.session.gid + " with " + req.body);
-            
+            var mc = mongodb.MongoClient;
+            mc.connect("mongodb://"+MONGODB_DB_HOST+":"+MONGODB_DB_PORT+"/"+MONGODB_DB_NAME, function(err,db){
+                var collection = db.collection('groups');
+                collection.update({groupId : req.body.groupId}, req.body, {w:1},function(err, results){
+                    console.log("callback from group update: "+JSON.stringify(err));
+                });
+            })
+//            Group.delete({groupId: req.session.gid});
+//            Group.update({groupId: req.session.gid}, {squares: req.body.squares}, function(err, numberAffected, raw) {
+//                if (err) {
+//                    res.json(401, {message: err});
+//                } else {
+//                    console.log('The number of updated documents was %d', numberAffected);
+//                    console.log('The raw response from Mongo was ', raw);
+//                    res.json(200, {message : "success"});
+//
+//                }
+//            });
             Group.findOne({groupId: req.session.gid}).exec(function(err, group) {
-                if(!_.isNull(group)) {
-                    console.log("Updating group");
-                    group.update(req.body);
+                if (!_.isNull(group)) {
+//                    group.remove();
+//                    Group.create(req.body);
+//                    console.log("Updating group");
+//                    console.log("input squares: " + JSON.stringify(req.body.squares[0]));
+//                    if (group.isInit('squares')) {
+//                        console.log("squares path is init");
+//                    } else {
+//                        console.log('squares path is NOT init');
+//                    }
+//                    group.set('squares', req.body.squares);
+//                    console.log("afeter set " + JSON.stringify(group.squares[0]));
+//                    group.save(function(err) {
+//                        if (!err) {
+//                            console.log("success updating");
+//                        }
+//                        else {
+//                            console.log("Error: could not update group ");
+//                        }
+//                    });
+                    
+
                     res.json({success: true});
                 } else {
-                    res.json(511,{success: false, msg: "Couldn't update group!"});
+                    res.json(511, {success: false, msg: "Couldn't update group!"});
                 }
             });
         };
@@ -318,7 +364,7 @@ var SampleApp = function() {
         //  Start the app on the specific interface (and port).
         self.app.listen(self.port, self.ipaddress, function() {
             console.log('%s: Node server started on %s:%d ...',
-                        Date(Date.now() ), self.ipaddress, self.port);
+                    Date(Date.now()), self.ipaddress, self.port);
         });
     };
 
