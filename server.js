@@ -332,6 +332,11 @@ var SampleApp = function() {
             delete req.body["_id"];
             console.log("updating " + req.session.gid + " with " + req.body);
             
+            try {
+                self.db.authenticate(MONGODB_DB_USERNAME, MONGODB_DB_PASSWORD, {authdb: "admin"}, function(err, res){
+                    if(err) { console.log("Coudn't auth with mongo")}
+                });
+            }
             self.db.collection('groups').update({groupId: req.body.groupId}, req.body, {w: 1}, function(err, results) {
                 console.log("callback from group update: " + JSON.stringify(err));
                 if(err) {throw err};
