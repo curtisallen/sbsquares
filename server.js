@@ -24,6 +24,7 @@ var SampleApp = function() {
 
     var Group = mongoose.model('Group');
     var User = mongoose.model('User');
+    var Square = mongoose.model('Square');
 
     /*self.dbServer = new mongodb.Server(MONGODB_DB_HOST,parseInt(MONGODB_DB_PORT));
     self.db = new mongodb.Db('sbsquares', self.dbServer, {auto_reconnect: true, journal: false});
@@ -151,6 +152,14 @@ var SampleApp = function() {
         self.routes['createGroup'] = function(req, res) {
             console.log("creating group" + req.body);
             var groupInstance = new Group();
+            for(var i = 0; i < 9; i++){
+                for(var j = 0; j < 9; j++){
+                    var square = new Square();
+                    square.x = i;
+                    square.y = j;
+                    groupInstance.squares.push(square);
+                }
+            }
             groupInstance.groupId = req.body.groupId;
             groupInstance.password = req.body.password;
 

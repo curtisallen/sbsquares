@@ -20,7 +20,7 @@ var User = new Schema({
 var Square = new Schema({
    x : Number,
    y : Number,
-   owner : User
+   owner : [User]
 });
 var Group = new Schema({
 	groupId : {type: String, unique: true},
@@ -32,6 +32,7 @@ var Group = new Schema({
 
 mongoose.model('Group', Group);
 mongoose.model('User', User);
+mongoose.model('Square', Square);
 mongoose.connect('mongodb://' + MONGODB_DB_HOST + '/' + MONGODB_DB_NAME ,{
 	//db  	: MONGODB_DB_NAME,
 	user 	: MONGODB_DB_USERNAME,

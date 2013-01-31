@@ -6,7 +6,9 @@
 	<h3 ng-show="email.show"><small>Email: {{email.value}}</small></h3>
 </div>
 <p>{{group}}</p>
-
+<div id="squares">
+    Squares : {{group.squares[0].x}}
+</div>
 <div>
 	<form ng-hide="showUserInfo" class="form-inline">
 		What's your email? 
