@@ -12,12 +12,27 @@
 <div>
 	<form ng-hide="showUserInfo" class="form-inline">
 		What's your email? 
-		<input type="email" ng-model="email">
+		<input type="email" ng-model="email" placeholder="yourmom@gmail.com">
 		<button type="submit" class="btn btn-primary" ng-click="userEmail()">Submit</button>
 	</form>
 	<form ng-show="showUserInfo" class="form-inline">
 		What's your name?
-		<input type="text" ng-model="name">
+		<input type="text" ng-model="name" placeholder="Johnny Appleseed">
 		<button type="submit" class="btn btn-primary" ng-click="saveUser()">Save</button>
 	</form>
+</div>
+
+<div id="adminPanel" ng-hide="true" class="modal hide fade">
+	<div class="modal-header">
+		<h3>
+			Your the first one here
+			<small>You must be a admin</small>
+		</h3>
+	</div>
+	<div class="modal-body">
+		What should the admin password be?
+		<input type="text" ng-model="adminPassword">
+		How much should each square cost?
+		<input type="text" ng-model="cost">
+	</div>
 </div>
