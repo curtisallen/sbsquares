@@ -243,6 +243,7 @@ var SampleApp = function() {
                 group.cost = req.body.cost;
                 group.adminPassword = req.body.adminPassword;
                 group.save();
+                res.json({success: true});
             });
         };
 
@@ -259,6 +260,7 @@ var SampleApp = function() {
                 if(!_.isNull(group)) {
                     console.log("Updating group");
                     group.update(req.body);
+                    res.json({success: true});
                 }
             });
         };
