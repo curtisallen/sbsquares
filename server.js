@@ -243,6 +243,7 @@ var SampleApp = function() {
                 group.cost = req.body.cost;
                 group.adminPassword = req.body.adminPassword;
                 group.save();
+                res.json({success: true});
             });
         };
 
