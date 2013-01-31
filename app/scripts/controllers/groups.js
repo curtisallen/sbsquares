@@ -12,15 +12,17 @@ sbsquaresApp.controller('GroupsCtrl', function($scope, $http, $location, $log) {
 
     $scope.showUserInfo = false;
 
+    $scope.pattern = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/;
+
     $scope.init = function() {
-        $log.log("group init called");
+        // $log.log("group init called");
         $http.get($location.url())
                 .success(function(data, status, headers, config) {
             //$log.log("Received group info: " + angular.toJson(data));
             $scope.group = data;
-            $log.log("square 0" + angular.toJson($scope.group.squares[0]));
+            // $log.log("square 0" + angular.toJson($scope.group.squares[0]));
             // if there are no admins create one
-            if (_.isUndefined($scope.group.adminPassword)) {
+            if (_.isUndefined($scope.group.cost)) {
                 $('#adminPanel').modal('show');
             }
             //$log.log("group: " + angular.toJson($scope.group));
@@ -29,7 +31,7 @@ sbsquaresApp.controller('GroupsCtrl', function($scope, $http, $location, $log) {
             $location.url('/');
         });
         var url = $location.url();
-        console.log(angular.toJson(url));
+        // console.log(angular.toJson(url));
     };
 
     $scope.calculateSquares = function() {
@@ -59,7 +61,7 @@ sbsquaresApp.controller('GroupsCtrl', function($scope, $http, $location, $log) {
         if (name == null | name === "") {
             return "";
         }
-        $log.log("min name called");
+        // $log.log("min name called");
         if (name.length > 12) {
             return name.substring(0, 8) + "...";
         } else {
@@ -77,7 +79,7 @@ sbsquaresApp.controller('GroupsCtrl', function($scope, $http, $location, $log) {
             return;
         }
         if (square.owner == null || square.owner.name == null) {
-            $log.log("adding name to square");
+            // $log.log("adding name to square");
             square.owner = [{name: $scope.name, email: $scope.email}];
             $scope.squaresCount = $scope.squaresCount + 1;
             $scope.squaresCost = $scope.squaresCount * $scope.group.cost;
@@ -101,7 +103,7 @@ sbsquaresApp.controller('GroupsCtrl', function($scope, $http, $location, $log) {
                 //$log.log("Received group info: " + angular.toJson(data));
                 $scope.group = data;
                 // if there are no admins create one
-                if (_.isUndefined($scope.group.adminPassword)) {
+                if (_.isUndefined($scope.group.cost)) {
                     $('#adminPanel').modal('show');
                 }
                 //$log.log("group: " + angular.toJson($scope.group));
@@ -115,14 +117,14 @@ sbsquaresApp.controller('GroupsCtrl', function($scope, $http, $location, $log) {
     }
 
     $scope.saveAdmin = function() {
-        $http.post('/saveAdmin', {cost: $scope.cost, /**adminPassword: $scope.adminPassword**/})
+        $http.post('/saveAdmin', {cost: $scope.cost})
                 .success(function(data, status, headers, config) {
             $http.get($location.url())
                     .success(function(data, status, headers, config) {
                 //$log.log("Received group info: " + angular.toJson(data));
                 $scope.group = data;
                 // if there are no admins create one
-                if (_.isUndefined($scope.group.adminPassword)) {
+                if (_.isUndefined($scope.group.cost)) {
                     $('#adminPanel').modal('show');
                 }
                 //$log.log("group: " + angular.toJson($scope.group));
@@ -133,7 +135,7 @@ sbsquaresApp.controller('GroupsCtrl', function($scope, $http, $location, $log) {
             $('#adminPanel').modal('hide');
         })
                 .error(function(data, status, headers, config) {
-            $log.log("Couldn't save admin info!");
+            // $log.log("Couldn't save admin info!");
             $location.url('/');
         });
     };
