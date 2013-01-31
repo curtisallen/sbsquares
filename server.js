@@ -261,6 +261,8 @@ var SampleApp = function() {
                     console.log("Updating group");
                     group.update(req.body);
                     res.json({success: true});
+                } else {
+                    res.json(511,{success: false, msg: "Couldn't update group!"});
                 }
             });
         };
