@@ -1,0 +1,47 @@
+<div class="hero-unit" ng-init="init()">
+	<h2>
+		Group: {{group.groupId}}
+		<small>password: {{group.password}}</small>
+	</h2>
+	<h3 ng-show="email.show"><small>Email: {{email.value}}</small></h3>
+</div>
+<div class="row-fluid hud">
+    <div class="span4">
+    	<h3 class="light" style="float: left;">Squares Taken : {{squaresCounts}}  Cost: ${{squaresCost}}</h3>
+    </div>
+	<div class="span8 top-gap">
+		<input data-ng-change="calculateSquares()" data-ng-model="name" style="width:100px" type="text" placeholder="Player Name">
+		<input data-ng-change="calculateSquares()" data-ng-model="email" style="width:150px" type="text" placeholder="Player Email">
+	</div>
+</div>
+<div id="squares gapper">
+    <ul class="unstyled">
+        <li data-ng-click="squareClick(square)" data-ng-repeat="square in group.squares" class="square"><span>{{minimizedName(square)}}</span></li>
+    </ul>
+</div>
+
+<div id="adminPanel" ng-hide="true" class="modal hide fade">
+	<div class="modal-header">
+		<h3>
+			Your the first one here
+			<small>You must be an admin</small>
+		</h3>
+	</div>
+	<div class="modal-body">
+		<form class="form-inline">
+			<p>
+				What should the admin password be:
+				<input class="span2" type="password" ng-model="adminPassword" placeholder="pippylongstockings">
+			</p>
+			<span>
+				How much should each square cost:
+				<div class="input-append">
+					<input class="span1" type="text" ng-model="cost" placeholder="10">
+					<span class="add-on">$</span>
+				</div>
+			</span>
+			<p>
+				<button type="submit" class="btn btn-primary" ng-click="saveAdmin()">Save</button>
+			</p>
+	</div>
+</div>

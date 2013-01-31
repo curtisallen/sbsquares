@@ -1,8 +1,10 @@
 #!/bin/env node
 //  OpenShift sample Node application
-var express = require('express');
-var fs      = require('fs');
-
+        var express = require('express');
+var fs = require('fs');
+var _ = require('underscore');
+var mongodb = require('mongodb');
+var mongoose = require('./db').getMongoose();
 
 /**
  *  Define the sample application.
@@ -12,6 +14,30 @@ var SampleApp = function() {
     //  Scope.
     var self = this;
 
+
+    // Setup
+    var MONGODB_DB_HOST = process.env.OPENSHIFT_MONGODB_DB_HOST || 'localhost';
+    var MONGODB_DB_PORT = process.env.OPENSHIFT_MONGODB_DB_PORT || 27017;
+    var MONGODB_DB_USERNAME = process.env.OPENSHIFT_MONGODB_DB_USERNAME || '';
+    var MONGODB_DB_PASSWORD = process.env.OPENSHIFT_MONGODB_DB_PASSWORD || '';
+    var MONGODB_DB_NAME = "sbsquares";
+    var IP = process.env.OPENSHIFT_INTERNAL_IP || '127.0.0.1';
+
+    var Group = mongoose.model('Group');
+    var User = mongoose.model('User');
+    var Square = mongoose.model('Square');
+
+    /*self.dbServer = new mongodb.Server(MONGODB_DB_HOST,parseInt(MONGODB_DB_PORT));
+     self.db = new mongodb.Db('sbsquares', self.dbServer, {auto_reconnect: true, journal: false});
+     self.dbUser = MONGODB_DB_USERNAME;
+     self.dbPass = MONGODB_DB_PASSWORD;
+     */
+    self.ipaddr = IP;
+    self.port = parseInt(process.env.OPENSHIFT_INTERNAL_PORT) || 3501;
+    if (typeof self.ipaddr === "undefined") {
+        console.warn('No OPENSHIFT_INTERNAL_IP environment variable');
+    }
+    ;
 
     /*  ================================================================  */
     /*  Helper functions.                                                 */
@@ -23,14 +49,15 @@ var SampleApp = function() {
     self.setupVariables = function() {
         //  Set the environment variables we need.
         self.ipaddress = process.env.OPENSHIFT_INTERNAL_IP;
-        self.port      = process.env.OPENSHIFT_INTERNAL_PORT || 8080;
+        self.port = process.env.OPENSHIFT_INTERNAL_PORT || 3501;
 
         if (typeof self.ipaddress === "undefined") {
             //  Log errors on OpenShift but continue w/ 127.0.0.1 - this
             //  allows us to run/test the app locally.
             console.warn('No OPENSHIFT_INTERNAL_IP var, using 127.0.0.1');
             self.ipaddress = "127.0.0.1";
-        };
+        }
+        ;
     };
 
 
@@ -39,11 +66,11 @@ var SampleApp = function() {
      */
     self.populateCache = function() {
         if (typeof self.zcache === "undefined") {
-            self.zcache = { 'index.html': '' };
+            self.zcache = { 'index.html': ''};
         }
 
         //  Local cache for static content.
-        self.zcache['index.html'] = fs.readFileSync('./index.html');
+        //self.zcache['index.html'] = fs.readFileSync('./index.html');
     };
 
 
@@ -51,7 +78,9 @@ var SampleApp = function() {
      *  Retrieve entry (content) from cache.
      *  @param {string} key  Key identifying content to retrieve from cache.
      */
-    self.cache_get = function(key) { return self.zcache[key]; };
+    self.cache_get = function(key) {
+        return self.zcache[key];
+    };
 
 
     /**
@@ -59,28 +88,32 @@ var SampleApp = function() {
      *  Terminate server on receipt of the specified signal.
      *  @param {string} sig  Signal to terminate on.
      */
-    self.terminator = function(sig){
+    self.terminator = function(sig) {
         if (typeof sig === "string") {
-           console.log('%s: Received %s - terminating sample app ...',
-                       Date(Date.now()), sig);
-           process.exit(1);
+            console.log('%s: Received %s - terminating sample app ...',
+                    Date(Date.now()), sig);
+            process.exit(1);
         }
-        console.log('%s: Node server stopped.', Date(Date.now()) );
+        console.log('%s: Node server stopped.', Date(Date.now()));
     };
 
 
     /**
      *  Setup termination handlers (for exit and a list of signals).
      */
-    self.setupTerminationHandlers = function(){
+    self.setupTerminationHandlers = function() {
         //  Process on exit and signals.
-        process.on('exit', function() { self.terminator(); });
+        process.on('exit', function() {
+            self.terminator();
+        });
 
         // Removed 'SIGPIPE' from the list - bugz 852598.
         ['SIGHUP', 'SIGINT', 'SIGQUIT', 'SIGILL', 'SIGTRAP', 'SIGABRT',
-         'SIGBUS', 'SIGFPE', 'SIGUSR1', 'SIGSEGV', 'SIGUSR2', 'SIGTERM'
-        ].forEach(function(element, index, array) {
-            process.on(element, function() { self.terminator(element); });
+            'SIGBUS', 'SIGFPE', 'SIGUSR1', 'SIGSEGV', 'SIGUSR2', 'SIGTERM'
+                ].forEach(function(element, index, array) {
+            process.on(element, function() {
+                self.terminator(element);
+            });
         });
     };
 
@@ -95,19 +128,189 @@ var SampleApp = function() {
     self.createRoutes = function() {
         self.routes = { };
 
-        // Routes for /health, /asciimo and /
-        self.routes['/health'] = function(req, res) {
-            res.send('1');
-        };
-
-        self.routes['/asciimo'] = function(req, res) {
-            var link = "http://i.imgur.com/kmbjB.png";
-            res.send("<html><body><img src='" + link + "'></body></html>");
-        };
-
         self.routes['/'] = function(req, res) {
             res.setHeader('Content-Type', 'text/html');
-            res.send(self.cache_get('index.html') );
+            res.send(self.cache_get('index.html'));
+        };
+
+        self.routes['login'] = function(req, res) {
+            console.log("loggin in");
+
+            Group.findOne({groupId: req.body.groupId, password: req.body.password})
+                    .exec(function(err, group) {
+                res.setHeader('Content-Type', 'application/json');
+                var body = {};
+                if (group) {
+                    // save session var
+                    req.session.gid = req.body.groupId;
+                    body.success = true;
+                    res.setHeader('Content-Length', body.length);
+                    res.json(body);
+                } else {
+                    var msg = "Invalid group id / password";
+                    // clear session
+                    req.session = null;
+                    console.log(msg);
+                    body.success = false;
+                    body.message = msg;
+                    res.setHeader('Content-Length', body.length);
+                    res.json(500, body);
+                }
+            });
+        };
+        self.routes['createGroup'] = function(req, res) {
+            console.log("creating group" + req.body);
+            var groupInstance = new Group();
+            for (var i = 0; i <= 9; i++) {
+                for (var j = 0; j <= 9; j++) {
+                    var square = new Square();
+                    square.x = i;
+                    square.y = j;
+                    groupInstance.squares.push(square);
+                }
+            }
+            groupInstance.groupId = req.body.groupId;
+            groupInstance.password = req.body.password;
+
+            // make sure there isn't any other groups with this id before saving
+            console.log(groupInstance);
+
+            Group.findOne({groupId: groupInstance.groupId}).exec(function(err, group) {
+                res.setHeader('Content-Type', 'application/json');
+                var body = {};
+                if (err) {
+                    // clear session
+                    req.session = null;
+                    var msg = "Error searching...";
+                    console.log(msg);
+                    body.success = false;
+                    body.message = msg;
+                    res.setHeader('Content-Length', body.length);
+                    res.json(500, body);
+                }
+                if (group) {
+                    // clear session
+                    req.session = null;
+                    // this group id exists send error
+                    var msg = "Group id already exists... ";
+                    console.log(msg);
+                    body.success = false;
+                    body.message = msg;
+                    res.setHeader('Content-Length', body.length);
+                    res.json(500, body);
+                } else {
+                    // we can save it
+                    // save session var
+                    req.session.gid = req.body.groupId;
+                    groupInstance.save();
+                    body.success = true;
+                    res.setHeader('Content-Length', body.length);
+                    res.json(body);
+                }
+
+            });
+        };
+
+        self.routes['getGroup'] = function(req, res) {
+            console.log("Looking for this group id " + req.params.groupId);
+            console.log("cookie: " + JSON.stringify(req.session));
+            if (_.isUndefined(req.session.gid)) {
+                var msg = "Login before you continue";
+                var body = {success: false, message: msg};
+                res.setHeader('Content-Length', body.length);
+                res.json(401, body);
+            }
+            Group.findOne({groupId: req.params.groupId}).exec(function(err, group) {
+                if (err) {
+                    var msg = "Invalid group id...";
+                    console.log(msg);
+                    var body = {};
+                    body.success = false;
+                    body.message = msg;
+                    res.setHeader('Content-Length', body.length);
+                    res.json(500, body);
+                } else {
+                    //console.log("group: " + group);
+                    res.json(group);
+                }
+
+            });
+        };
+
+        self.routes['saveAdmin'] = function(req, res) {
+            // save admin for this 
+            if (_.isUndefined(req.session.gid)) {
+                var msg = "Login before you continue";
+                var body = {success: false, message: msg};
+                res.setHeader('Content-Length', body.length);
+                res.json(401, body);
+            }
+            //save password and cost
+            Group.findOne({groupId: req.session.gid}).exec(function(err, group) {
+                console.log("Saveing cost: " + req.body.cost);
+                console.log("Saveing adminPassword: " + req.body.adminPassword);
+                group.cost = req.body.cost;
+                group.adminPassword = req.body.adminPassword;
+                group.save();
+                res.json({success: true});
+            });
+        };
+
+        self.routes['updateGroup'] = function(req, res) {
+            if (_.isUndefined(req.session.gid)) {
+                var msg = "Login before you continue";
+                var body = {success: false, message: msg};
+                res.setHeader('Content-Length', body.length);
+                res.json(401, body);
+            }
+            delete req.body["_id"];
+            console.log("updating " + req.session.gid + " with " + req.body);
+            var mc = mongodb.MongoClient;
+            mc.connect("mongodb://"+MONGODB_DB_HOST+":"+MONGODB_DB_PORT+"/"+MONGODB_DB_NAME, function(err,db){
+                var collection = db.collection('groups');
+                collection.update({groupId : req.body.groupId}, req.body, {w:1},function(err, results){
+                    console.log("callback from group update: "+JSON.stringify(err));
+                });
+            })
+//            Group.delete({groupId: req.session.gid});
+//            Group.update({groupId: req.session.gid}, {squares: req.body.squares}, function(err, numberAffected, raw) {
+//                if (err) {
+//                    res.json(401, {message: err});
+//                } else {
+//                    console.log('The number of updated documents was %d', numberAffected);
+//                    console.log('The raw response from Mongo was ', raw);
+//                    res.json(200, {message : "success"});
+//
+//                }
+//            });
+            Group.findOne({groupId: req.session.gid}).exec(function(err, group) {
+                if (!_.isNull(group)) {
+//                    group.remove();
+//                    Group.create(req.body);
+//                    console.log("Updating group");
+//                    console.log("input squares: " + JSON.stringify(req.body.squares[0]));
+//                    if (group.isInit('squares')) {
+//                        console.log("squares path is init");
+//                    } else {
+//                        console.log('squares path is NOT init');
+//                    }
+//                    group.set('squares', req.body.squares);
+//                    console.log("afeter set " + JSON.stringify(group.squares[0]));
+//                    group.save(function(err) {
+//                        if (!err) {
+//                            console.log("success updating");
+//                        }
+//                        else {
+//                            console.log("Error: could not update group ");
+//                        }
+//                    });
+                    
+
+                    res.json({success: true});
+                } else {
+                    res.json(500,{success: false, msg: "Couldn't update group!"});
+                }
+            });
         };
     };
 
@@ -118,12 +321,26 @@ var SampleApp = function() {
      */
     self.initializeServer = function() {
         self.createRoutes();
-        self.app = express.createServer();
+        self.app = express();
 
         //  Add handlers for the app (from the routes).
-        for (var r in self.routes) {
-            self.app.get(r, self.routes[r]);
-        }
+        // for (var r in self.routes) {
+        //     self.app.get(r, self.routes[r]);
+        // }
+        // server static content 
+        self.app.use(express.static(__dirname + '/app'));
+        self.app.use(express.static(__dirname + '/components'));
+        // conf
+        self.app.use(express.bodyParser());
+        self.app.use(express.cookieParser());
+        self.app.use(express.session({secret: '4265d78bcf30e9f7f9d3963adf982699'}));
+        // routes
+        self.app.get('/', self.routes['/']);
+        self.app.post('/createGroup', self.routes['createGroup']);
+        self.app.post('/login', self.routes['login']);
+        self.app.get('/group/:groupId', self.routes['getGroup']);
+        self.app.post('/saveAdmin', self.routes['saveAdmin']);
+        self.app.post('/updateGroup', self.routes['updateGroup']);
     };
 
 
@@ -147,7 +364,7 @@ var SampleApp = function() {
         //  Start the app on the specific interface (and port).
         self.app.listen(self.port, self.ipaddress, function() {
             console.log('%s: Node server started on %s:%d ...',
-                        Date(Date.now() ), self.ipaddress, self.port);
+                    Date(Date.now()), self.ipaddress, self.port);
         });
     };
 
