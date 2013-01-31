@@ -22,8 +22,14 @@
 
 <div id="ravens" class="top-gap">Baltimore Ravens</div>
 <div id="fourtynineers" class="rotate">San Francisco 49ers</div>
+<div id="vert-row" class="legend">
+	<ul>
+		<li data-ng-repeat="number in group.yNumbers">{{number}}</li>
+	</ul>
+</div>
 <div id="squares">
-    <ul class="unstyled squares">
+    <ul class="unstyled squares">	
+    	<li data-ng-repeat="number in group.xNumbers" class="tit-square legend">{{number}}</li>
         <li data-ng-click="squareClick(square)" data-ng-repeat="square in group.squares" class="square"><span>{{minimizedName(square)}}</span></li>
     </ul>
 </div>

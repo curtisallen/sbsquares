@@ -129,6 +129,15 @@ footer a {
     background: rgba(255, 255, 255, 0.9);
 }
 
+.tit-square {
+    width:92px;
+    height: 20px;
+    float:left;
+    text-align: center;
+    vertical-align: bottom;
+    display:table;
+}
+
 .square span {
     display: table-cell;
     vertical-align: middle;
@@ -145,10 +154,51 @@ footer a {
     max-height: 960px;
     height: 960px;
     margin: -20px 0 50px 0;
+    padding: 30px 40px;
 }
 
 .squares ul {
     list-style: none; 
+}
+
+.legend {
+	color: #fff;
+	font-size: 1.5em;
+}
+
+#hori-row {
+	width: 940px;
+}
+
+#hori-row ul {
+	margin-left: 50px;
+	list-style: none;
+}
+
+#hori-row li {
+	display: inline;
+	padding: 0 30px;
+}
+
+.derp {
+	width: 92px;
+	min-width: 92px;
+	max-width: 92px;
+}
+
+#vert-row {
+	width: 20px;
+	height: 940px;
+	float: left;
+}
+
+#vert-row ul {
+	margin-top: 70px;
+	list-style: none;
+}
+
+#vert-row li {
+	height: 92px;
 }
 
 #ravens {
