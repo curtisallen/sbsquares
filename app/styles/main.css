@@ -24,12 +24,20 @@
 		margin: 17px 0;
 	}
 
+	.top-gap {
+		margin-top: 15px;
+	}
+
     .top-gap-l {
 		margin-top: 50px;
 	}
 
 	.top-gap-xl {
 		margin-top: 150px;
+	}
+
+	.gapper {
+		margin-bottom: 25px;
 	}
 }
 
@@ -93,12 +101,21 @@ footer {
 	position: fixed;
     bottom: 0;
 	text-align: center;
-	padding: 0 7px;
-	background: rgba(20, 20, 20, 0.8);
-	color: #aaa;
 }
 
 footer a {
+	color: #aaa;
+}
+
+.light {
+	color: #fff;
+	font-weight: lighter;
+}
+
+.hud {
+	background: rgba(20, 20, 20, 0.8);
+	padding: 0 7px;
+	background: rgba(20, 20, 20, 0.8);
 	color: #aaa;
 }
 
@@ -109,7 +126,7 @@ footer a {
     border: 1px solid black;
     text-align: center;
     display:table;
-    
+    background: rgba(255, 255, 255, 0.9);
 }
 
 .square span {
