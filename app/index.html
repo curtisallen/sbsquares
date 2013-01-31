@@ -9,7 +9,8 @@
         <title></title>
         <meta name="description" content=""/>
         <meta name="viewport" content="width=device-width"/>
-        <link rel="stylesheet" type="text/css" href="styles/bootstrap.css">
+        <link rel="stylesheet" type="text/css" href="styles/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="styles/bootstrap-responsive.min.css">
         <link href='http://fonts.googleapis.com/css?family=Nova+Square' rel='stylesheet' type='text/css'>
         <link rel="stylesheet" href="styles/main.css"/>
 
@@ -27,9 +28,12 @@
 
         <!-- Add your site or application content here -->
         <div class="container" ng-view></div>
-
+        
+        <script src="components/jquery/jquery.min.js"></script>
         <script src="scripts/vendor/angular.js"></script>
         <script src="components/underscore/underscore-min.js"></script>
+        <script src="components/bootstrap/js/bootstrap-modal.js"></script>
+
 
         <!-- build:js scripts/scripts.js -->
         <script src="scripts/app.js"></script>
@@ -45,4 +49,7 @@
             s.parentNode.insertBefore(g,s)}(document,'script'));
         </script>
     </body>
+    <footer class="visible-desktop">Built by the Acheevos crew: <a href="http://twitter.com/cnallen">@cnallen</a>, 
+       <a href="http://twitter.com/diablo3god">@diablo3god</a>, and  <a href="http://twitter.com/tyburg">@tyburg</a>
+          background by <a href="http://www.stockfreeimages.com/3601626/Fifty-Yard-Line.html">Rickbolt</a></footer>
 </html>

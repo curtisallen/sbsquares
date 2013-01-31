@@ -11,19 +11,30 @@ var MONGODB_DB_USERNAME = process.env.OPENSHIFT_MONGODB_DB_USERNAME || '';
 var MONGODB_DB_PASSWORD = process.env.OPENSHIFT_MONGODB_DB_PASSWORD || '';
 var MONGODB_DB_NAME = "sbsquares";
 
+
 var User = new Schema({
 	name : {type: String, unique: true},
 	email: String,
 	squares: [String]
 });
+var Square = new Schema({
+   x : Number,
+   y : Number,
+   owner : [User]
+});
 var Group = new Schema({
 	groupId : {type: String, unique: true},
 	password: String,
-	users: [User]
+	adminPassword: String,
+	users: [User],
+	squares : [Square],
+	cost: Number
+        
 });
 
 mongoose.model('Group', Group);
 mongoose.model('User', User);
+mongoose.model('Square', Square);
 mongoose.connect('mongodb://' + MONGODB_DB_HOST + '/' + MONGODB_DB_NAME ,{
 	//db  	: MONGODB_DB_NAME,
 	user 	: MONGODB_DB_USERNAME,

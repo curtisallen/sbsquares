@@ -9,9 +9,16 @@ sbsquaresApp.controller('GroupsCtrl', function($scope, $http, $location, $log) {
   $scope.showUserInfo = false;
 
   $scope.init = function() {
+      $log.log("group init called");
   	$http.get($location.url())
   	.success(function(data, status, headers, config) {
+		$log.log("Received group info: "+angular.toJson(data));
   		$scope.group = data;
+		$log.log("group: "+angular.toJson($scope.group));
+		// if there are no admins create one
+		if(_.isUndefined($scope.group.adminPassword)) {
+			$('#adminPanel').modal({show:true});
+		}
   	}).error(function(data, status, headers, config) {
   		// redirect becuase there is no session
   		$location.url('/');
