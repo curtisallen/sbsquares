@@ -5,22 +5,15 @@
 	</h2>
 	<h3 ng-show="email.show"><small>Email: {{email.value}}</small></h3>
 </div>
+<div>
+    <div>Name: <input data-ng-change="calculateSquares()" data-ng-model="name" style="width:100px" type="text" placeholder="Insert Name"> Email: <input data-ng-change="calculateSquares()" data-ng-model="email" style="width:150px" type="text" placeholder="Insert Email"></div>
+    <br />
+    Squares Taken : {{squaresCounts}}  Cost: ${{squaresCost}}
+</div>
 <div id="squares">
     <ul class="unstyled">
-        <li data-ng-repeat="square in group.squares" class="square">{{square.x}},{{square.y}}</li>
+        <li data-ng-click="squareClick(square)" data-ng-repeat="square in group.squares" class="square"><span>{{minimizedName(square.owner.name)}}</span></li>
     </ul>
-</div>
-<div>
-	<form ng-hide="showUserInfo" class="form-inline">
-		What's your email? 
-		<input type="email" ng-model="email" placeholder="yourmom@gmail.com">
-		<button type="submit" class="btn btn-primary" ng-click="userEmail()">Submit</button>
-	</form>
-	<form ng-show="showUserInfo" class="form-inline">
-		What's your name?
-		<input type="text" ng-model="name" placeholder="Johnny Appleseed">
-		<button type="submit" class="btn btn-primary" ng-click="saveUser()">Save</button>
-	</form>
 </div>
 
 <div id="adminPanel" ng-hide="true" class="modal hide fade">
@@ -31,9 +24,20 @@
 		</h3>
 	</div>
 	<div class="modal-body">
-		What should the admin password be?
-		<input type="text" ng-model="adminPassword">
-		How much should each square cost?
-		<input type="text" ng-model="cost">
+		<form class="form-inline">
+			<p>
+				What should the admin password be:
+				<input class="span2" type="password" ng-model="adminPassword" placeholder="pippylongstockings">
+			</p>
+			<span>
+				How much should each square cost:
+				<div class="input-append">
+					<input class="span1" type="text" ng-model="cost" placeholder="10">
+					<span class="add-on">$</span>
+				</div>
+			</span>
+			<p>
+				<button type="submit" class="btn btn-primary" ng-click="saveAdmin()">Save</button>
+			</p>
 	</div>
 </div>

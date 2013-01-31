@@ -103,11 +103,22 @@ footer a {
 }
 
 .square {
-    width:96px;
-    height:96px;
+    width:92px;
+    height:92px;
     float:left;
     border: 1px solid black;
-    border-collapse: collapse;
+    text-align: center;
+    display:table;
+    
+}
+
+.square span {
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center;
+    height:92px;
+    max-width:92px;
+    max-height:92px;
 }
 
 .squares {
