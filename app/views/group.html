@@ -36,9 +36,20 @@
 		</h3>
 	</div>
 	<div class="modal-body">
-		What should the admin password be?
-		<input type="text" ng-model="adminPassword">
-		How much should each square cost?
-		<input type="text" ng-model="cost">
+		<form class="form-inline">
+			<p>
+				What should the admin password be:
+				<input class="span2" type="password" ng-model="adminPassword" placeholder="pippylongstockings">
+			</p>
+			<span>
+				How much should each square cost:
+				<div class="input-append">
+					<input class="span1" type="text" ng-model="cost" placeholder="10">
+					<span class="add-on">$</span>
+				</div>
+			</span>
+			<p>
+				<button type="submit" class="btn btn-primary" ng-click="saveAdmin()">Save</button>
+			</p>
 	</div>
 </div>

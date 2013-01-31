@@ -228,9 +228,40 @@ var SampleApp = function() {
             });
         };
 
-        self.routes['checkEmail'] = function(req, res) {
-            //Group.findOne({groupId})
-        }
+        self.routes['saveAdmin'] = function(req, res) {
+            // save admin for this 
+            if(_.isUndefined(req.session.gid)) {
+                var msg = "Login before you continue";
+                var body = {success: false, message: msg};
+                res.setHeader('Content-Length', body.length);
+                res.json(401, body);
+            }
+            //save password and cost
+            Group.findOne({groupId: req.session.gid}).exec(function(err, group) {
+                console.log("Saveing cost: " + req.body.cost);
+                console.log("Saveing adminPassword: " + req.body.adminPassword);
+                group.cost = req.body.cost;
+                group.adminPassword = req.body.adminPassword;
+                group.save();
+            });
+        };
+
+        self.routes['updateGroup'] = function(req, res) {
+            if(_.isUndefined(req.session.gid)) {
+                var msg = "Login before you continue";
+                var body = {success: false, message: msg};
+                res.setHeader('Content-Length', body.length);
+                res.json(401, body);
+            }
+            console.log("updating " + req.session.gid + " with " + req.body);
+            
+            Group.findOne({groupId: req.session.gid}).exec(function(err, group) {
+                if(!_.isNull(group)) {
+                    console.log("Updating group");
+                    group.update(req.body);
+                }
+            });
+        };
     };
 
 
@@ -258,6 +289,8 @@ var SampleApp = function() {
         self.app.post('/createGroup', self.routes['createGroup']);
         self.app.post('/login', self.routes['login']);
         self.app.get('/group/:groupId', self.routes['getGroup']);
+        self.app.post('/saveAdmin', self.routes['saveAdmin']);
+        self.app.post('/updateGroup', self.routes['updateGroup']);
     };
 
 
