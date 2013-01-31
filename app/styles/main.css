@@ -1,1 +1,5 @@
 /* Will be compiled down to a single stylesheet with your sass files */
+
+h1, h2, h3, h4, h5, h6 {
+	font-family: 'Nova Square', cursive;
+}
