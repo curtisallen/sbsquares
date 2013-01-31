@@ -5,9 +5,14 @@
 	</h2>
 	<h3 ng-show="email.show"><small>Email: {{email.value}}</small></h3>
 </div>
+<div>
+    <div>Name: <input data-ng-change="calculateSquares()" data-ng-model="name" style="width:100px" type="text" placeholder="Insert Name"> Email: <input data-ng-change="calculateSquares()" data-ng-model="email" style="width:150px" type="text" placeholder="Insert Email"></div>
+    <br />
+    Squares Taken : {{squaresCounts}}  Cost: ${{squaresCost}}
+</div>
 <div id="squares">
     <ul class="unstyled">
-        <li data-ng-repeat="square in group.squares" class="square">{{square.x}},{{square.y}}</li>
+        <li data-ng-click="squareClick(square)" data-ng-repeat="square in group.squares" class="square"><span>{{minimizedName(square.owner.name)}}</span></li>
     </ul>
 </div>
 <div>
