@@ -5,6 +5,8 @@ sbsquaresApp.controller('GroupsCtrl', function($scope, $http, $location, $log) {
   $scope.group = null;
   $scope.email = {show: false, value: null};
   $scope.name = null;
+  $scope.cost = null;
+  $scope.adminPassword = null;
 
   $scope.showUserInfo = false;
 
@@ -37,5 +39,13 @@ sbsquaresApp.controller('GroupsCtrl', function($scope, $http, $location, $log) {
   		$scope.showUserInfo = true;
   	}
   	$log.log("Got this user " + user);
-  }
+  };
+
+  $scope.saveAdmin = function() {
+  	$http.post('/saveAdmin', {cost: $scope.cost, adminPassword: $scope.adminPassword})
+  		.error(function(data, status, headers, config) {
+  			$log.log("Couldn't save admin info!");
+  			$location.url('/');
+  		});
+  };
 });
