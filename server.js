@@ -180,7 +180,7 @@ var SampleApp = function() {
             groupInstance.password = req.body.password;
 
             // make sure there isn't any other groups with this id before saving
-            console.log(groupInstance);
+            //console.log(groupInstance);
 
             Group.findOne({groupId: groupInstance.groupId}).exec(function(err, group) {
                 res.setHeader('Content-Type', 'application/json');
