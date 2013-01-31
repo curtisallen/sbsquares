@@ -26,7 +26,8 @@ var Group = new Schema({
 	groupId : {type: String, unique: true},
 	password: String,
 	users: [User],
-        squares : [Square]
+	squares : [Square],
+	cost: Number
         
 });
 
