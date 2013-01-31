@@ -15,18 +15,6 @@
         <li data-ng-click="squareClick(square)" data-ng-repeat="square in group.squares" class="square"><span>{{minimizedName(square.owner.name)}}</span></li>
     </ul>
 </div>
-<div>
-	<form ng-hide="showUserInfo" class="form-inline">
-		What's your email? 
-		<input type="email" ng-model="email" placeholder="yourmom@gmail.com">
-		<button type="submit" class="btn btn-primary" ng-click="userEmail()">Submit</button>
-	</form>
-	<form ng-show="showUserInfo" class="form-inline">
-		What's your name?
-		<input type="text" ng-model="name" placeholder="Johnny Appleseed">
-		<button type="submit" class="btn btn-primary" ng-click="saveUser()">Save</button>
-	</form>
-</div>
 
 <div id="adminPanel" ng-hide="true" class="modal hide fade">
 	<div class="modal-header">

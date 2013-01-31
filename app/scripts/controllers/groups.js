@@ -18,7 +18,10 @@ sbsquaresApp.controller('GroupsCtrl', function($scope, $http, $location, $log) {
                 .success(function(data, status, headers, config) {
             //$log.log("Received group info: " + angular.toJson(data));
             $scope.group = data;
-
+            // if there are no admins create one
+			if(_.isUndefined($scope.group.adminPassword)) {
+				$('#adminPanel').modal('show');
+			}
             //$log.log("group: " + angular.toJson($scope.group));
         }).error(function(data, status, headers, config) {
             // redirect becuase there is no session
@@ -82,23 +85,14 @@ sbsquaresApp.controller('GroupsCtrl', function($scope, $http, $location, $log) {
         }
     }
 
-    $scope.userEmail = function() {
-        var user = _.find($scope.group.users, function(mail) {
-            if (mail === email) {
-                return mail;
-            }
-        });
-        if (_.isUndefined(user)) { // add this user to the model
-            $scope.showUserInfo = true;
-        }
-        $log.log("Got this user " + user);
-    };
-
     $scope.saveAdmin = function() {
         $http.post('/saveAdmin', {cost: $scope.cost, adminPassword: $scope.adminPassword})
-                .error(function(data, status, headers, config) {
-            $log.log("Couldn't save admin info!");
-            $location.url('/');
+        	.success(function(data, status, headers, config) {
+        		$('#adminPanel').modal('hide');
+        	})
+            .error(function(data, status, headers, config) {
+        		$log.log("Couldn't save admin info!");
+        		$location.url('/');
         });
     };
 });
