@@ -115,7 +115,7 @@ sbsquaresApp.controller('GroupsCtrl', function($scope, $http, $location, $log) {
     }
 
     $scope.saveAdmin = function() {
-        $http.post('/saveAdmin', {cost: $scope.cost, adminPassword: $scope.adminPassword})
+        $http.post('/saveAdmin', {cost: $scope.cost, /**adminPassword: $scope.adminPassword**/})
                 .success(function(data, status, headers, config) {
             $http.get($location.url())
                     .success(function(data, status, headers, config) {

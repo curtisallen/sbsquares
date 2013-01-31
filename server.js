@@ -255,9 +255,9 @@ var SampleApp = function() {
             //save password and cost
             Group.findOne({groupId: req.session.gid}).exec(function(err, group) {
                 console.log("Saveing cost: " + req.body.cost);
-                console.log("Saveing adminPassword: " + req.body.adminPassword);
+                //console.log("Saveing adminPassword: " + req.body.adminPassword);
                 group.cost = req.body.cost;
-                group.adminPassword = req.body.adminPassword;
+                //group.adminPassword = req.body.adminPassword;
                 group.save();
                 res.json({success: true});
             });
