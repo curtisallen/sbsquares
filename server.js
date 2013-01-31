@@ -16,11 +16,16 @@ var SampleApp = function() {
 
 
     // Setup
-    var MONGODB_DB_HOST = process.env.OPENSHIFT_MONGODB_DB_HOST || 'localhost';
+    var MONGODB_DB_HOST = process.env.OPENSHIFT_MONGODB_DB_HOST || '127.0.0.1';
     var MONGODB_DB_PORT = process.env.OPENSHIFT_MONGODB_DB_PORT || 27017;
     var MONGODB_DB_USERNAME = process.env.OPENSHIFT_MONGODB_DB_USERNAME || '';
     var MONGODB_DB_PASSWORD = process.env.OPENSHIFT_MONGODB_DB_PASSWORD || '';
     var MONGODB_DB_NAME = "sbsquares";
+
+    self.dbServer = new mongodb.Server(MONGODB_DB_HOST,parseInt(MONGODB_DB_PORT));
+    self.db = new mongodb.Db(MONGODB_DB_NAME, self.dbServer, {auto_reconnect: true});
+
+        
     var IP = process.env.OPENSHIFT_INTERNAL_IP || '127.0.0.1';
 
     var Group = mongoose.model('Group');
@@ -124,7 +129,18 @@ var SampleApp = function() {
         });
     };
 
+    // Logic to open a database connection. We are going to call this outside of app so it is available to all our functions inside.
 
+      self.connectDb = function(callback){
+        console.log("Connecting to db");
+        self.db.open(function(err, db){
+          if(err){ console.log("Error connecting "); throw err };
+          self.db.authenticate(MONGODB_DB_USERNAME, MONGODB_DB_PASSWORD, {authdb: "admin"}, function(err, res){
+            if(err){ throw err };
+            callback();
+          });
+        });
+      };
     /*  ================================================================  */
     /*  App server functions (main app logic here).                       */
     /*  ================================================================  */
@@ -133,6 +149,7 @@ var SampleApp = function() {
      *  Create the routing table entries + handlers for the application.
      */
     self.createRoutes = function() {
+
         self.routes = { };
 
         self.routes['/'] = function(req, res) {
@@ -314,47 +331,14 @@ var SampleApp = function() {
             }
             delete req.body["_id"];
             console.log("updating " + req.session.gid + " with " + req.body);
-            var mc = mongodb.MongoClient;
-            mc.connect("mongodb://" + MONGODB_DB_HOST + ":" + MONGODB_DB_PORT + "/" + MONGODB_DB_NAME, function(err, db) {
-                var collection = db.collection('groups');
-                collection.update({groupId: req.body.groupId}, req.body, {w: 1}, function(err, results) {
-                    console.log("callback from group update: " + JSON.stringify(err));
-                });
-            })
-//            Group.delete({groupId: req.session.gid});
-//            Group.update({groupId: req.session.gid}, {squares: req.body.squares}, function(err, numberAffected, raw) {
-//                if (err) {
-//                    res.json(401, {message: err});
-//                } else {
-//                    console.log('The number of updated documents was %d', numberAffected);
-//                    console.log('The raw response from Mongo was ', raw);
-//                    res.json(200, {message : "success"});
-//
-//                }
-//            });
+            
+            self.db.collection('groups').update({groupId: req.body.groupId}, req.body, {w: 1}, function(err, results) {
+                console.log("callback from group update: " + JSON.stringify(err));
+                if(err) {throw err};
+            });
+            
             Group.findOne({groupId: req.session.gid}).exec(function(err, group) {
                 if (!_.isNull(group)) {
-//                    group.remove();
-//                    Group.create(req.body);
-//                    console.log("Updating group");
-//                    console.log("input squares: " + JSON.stringify(req.body.squares[0]));
-//                    if (group.isInit('squares')) {
-//                        console.log("squares path is init");
-//                    } else {
-//                        console.log('squares path is NOT init');
-//                    }
-//                    group.set('squares', req.body.squares);
-//                    console.log("afeter set " + JSON.stringify(group.squares[0]));
-//                    group.save(function(err) {
-//                        if (!err) {
-//                            console.log("success updating");
-//                        }
-//                        else {
-//                            console.log("Error: could not update group ");
-//                        }
-//                    });
-
-
                     res.json({success: true});
                 } else {
                     res.json(500, {success: false, msg: "Couldn't update group!"});
@@ -404,6 +388,7 @@ var SampleApp = function() {
 
         // Create the express server and routes.
         self.initializeServer();
+        //self.connectDb();
     };
 
 
@@ -427,5 +412,6 @@ var SampleApp = function() {
  */
 var zapp = new SampleApp();
 zapp.initialize();
-zapp.start();
+
+zapp.connectDb(zapp.start());
 
