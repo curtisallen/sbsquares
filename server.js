@@ -125,16 +125,21 @@ var SampleApp = function() {
 
         self.routes['login'] = function(req, res) {
             console.log("loggin in");
+
             Group.findOne({groupId: req.body.groupId, password: req.body.password})
             .exec(function(err, group) {
                 res.setHeader('Content-Type', 'application/json');
                 var body = {};
                 if(group) {
+                    // save session var
+                    req.session.gid = req.body.groupId;
                     body.success = true;
                     res.setHeader('Content-Length', body.length);
                     res.json(body);
                 } else {
                     var msg = "Invalid group id / password";
+                    // clear session
+                    req.session = null;
                     console.log(msg);
                     body.success = false;
                     body.message = msg;
@@ -150,17 +155,14 @@ var SampleApp = function() {
             groupInstance.password = req.body.password;
 
             // make sure there isn't any other groups with this id before saving
-            /*Group.find({groupId: groupInstance.groupId}, function(err, docs) {
-                console.log("error" + err);
-                console.log("docs " + docs);
-
-            });*/
             console.log(groupInstance);
 
             Group.findOne({groupId: groupInstance.groupId}).exec(function(err, group) {
                 res.setHeader('Content-Type', 'application/json');
                 var body = {};
                 if (err) {
+                    // clear session
+                    req.session = null;
                     var msg = "Error searching...";
                     console.log(msg);
                     body.success = false;
@@ -169,6 +171,8 @@ var SampleApp = function() {
                     res.json(500, body);
                 }
                 if(group) {
+                    // clear session
+                    req.session = null;
                     // this group id exists send error
                     var msg = "Group id already exists... ";
                     console.log(msg);
@@ -178,6 +182,8 @@ var SampleApp = function() {
                     res.json(500, body);
                 } else {
                     // we can save it
+                    // save session var
+                    req.session.gid = req.body.groupId;
                     groupInstance.save();
                     body.success = true;
                     res.setHeader('Content-Length', body.length);
@@ -189,6 +195,13 @@ var SampleApp = function() {
 
         self.routes['getGroup'] = function(req, res) {
             console.log("Looking for this group id " + req.params.groupId);
+            console.log("cookie: " + JSON.stringify(req.session));
+            if(_.isUndefined(req.session.gid)) {
+                var msg = "Login before you continue";
+                var body = {success: false, message: msg};
+                res.setHeader('Content-Length', body.length);
+                res.json(401, body);
+            }
             Group.findOne({groupId: req.params.groupId}).exec(function(err, group) {
                 if(err) {
                     var msg = "Invalid group id...";
