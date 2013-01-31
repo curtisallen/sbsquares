@@ -1,1 +1,20 @@
 /* Will be compiled down to a single stylesheet with your sass files */
+
+.square {
+    width:96px;
+    height:96px;
+    float:left;
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+
+.squares {
+    max-width: 960px;
+    max-height: 960px;
+    min-width: 960px;
+    max-height:960px;
+}
+
+.squares ul {
+    list-style: none; 
+}

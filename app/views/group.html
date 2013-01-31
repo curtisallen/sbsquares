@@ -5,9 +5,10 @@
 	</h2>
 	<h3 ng-show="email.show"><small>Email: {{email.value}}</small></h3>
 </div>
-<p>{{group}}</p>
 <div id="squares">
-    Squares : {{group.squares[0].x}}
+    <ul class="unstyled">
+        <li data-ng-repeat="square in group.squares" class="square">{{square.x}},{{square.y}}</li>
+    </ul>
 </div>
 <div>
 	<form ng-hide="showUserInfo" class="form-inline">
