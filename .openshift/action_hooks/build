@@ -34,15 +34,15 @@ fi
 # Check for phantomjs
 export PATH=$OPENSHIFT_DATA_DIR/phantomjs-1.8.1-linux-x86_64/bin:$PATH
 
-command -v phantomjs >/dev/null 2>&1 || {
-	echo "Installing phantomjs"
-	cd $OPENSHIFT_TMP_DIR
-	curl -s http://phantomjs.googlecode.com/files/phantomjs-1.8.1-linux-x86_64.tar.bz2 > phanomjs-1.8.1.tar.bz2
-	cd $OPENSHIFT_DATA_DIR/
-	tar -xjf $OPENSHIFT_TMP_DIR/phantomjs-1.8.1.tar.bz2
-	echo "phantom js installed"
-
-}
+#command -v phantomjs >/dev/null 2>&1 || {
+#	echo "Installing phantomjs"
+#	cd $OPENSHIFT_TMP_DIR
+#	curl -s http://phantomjs.googlecode.com/files/phantomjs-1.8.1-linux-x86_64.tar.bz2 > phanomjs-1.8.1.tar.bz2
+#	cd $OPENSHIFT_DATA_DIR/
+#	tar -xjf $OPENSHIFT_TMP_DIR/phantomjs-1.8.1.tar.bz2
+#	echo "phantom js installed"
+#
+#}
 
 #put all the things on the PATH
 export PATH=$OPENSHIFT_DATA_DIR/bin:$OPENSHIFT_DATA_DIR/gems/bin:$OPENSHIFT_DATA_DIR/phantomjs-1.8.1-linux-x86_64/bin/:$PATH

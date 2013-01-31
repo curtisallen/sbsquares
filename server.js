@@ -308,7 +308,7 @@ var SampleApp = function() {
 
                     res.json({success: true});
                 } else {
-                    res.json(511, {success: false, msg: "Couldn't update group!"});
+                    res.json(500,{success: false, msg: "Couldn't update group!"});
                 }
             });
         };

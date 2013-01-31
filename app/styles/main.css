@@ -1,4 +1,123 @@
 /* Will be compiled down to a single stylesheet with your sass files */
+@media (min-width: 768px) {
+	html { 
+		background: url(../img/football.jpg) no-repeat center center fixed; 
+		-webkit-background-size: cover;
+		-moz-background-size: cover;
+		-o-background-size: cover;
+		background-size: cover;
+
+	}
+
+	h1, h2, h3, h4, h5, h6 {
+		font-family: 'Nova Square', cursive;
+	}
+
+	.hero-unit {
+		background-color: rgba(240, 240, 240, 0.8);
+	    border-radius: 6px 6px 6px 6px;
+	    margin-bottom: 30px;
+	    padding: 60px;
+	}
+
+	.hero-unit p {
+		margin: 17px 0;
+	}
+
+	.top-gap {
+		margin-top: 15px;
+	}
+
+    .top-gap-l {
+		margin-top: 50px;
+	}
+
+	.top-gap-xl {
+		margin-top: 150px;
+	}
+
+	.gapper {
+		margin-bottom: 25px;
+	}
+}
+
+/* Landscape phone to portrait tablet */
+@media (max-width: 767px) {
+	html {
+		background: url(../img/football_small.jpg) repeat-y center center fixed; 
+		-webkit-background-size: cover;
+		-moz-background-size: cover;
+		-o-background-size: cover;
+		background-size: cover;
+		min-height: 100%;
+	}
+
+	h1, h2, h3, h4, h5, h6 {
+		font-family: 'Nova Square', cursive;
+	}
+
+	.hero-unit {
+		background-color: rgba(240, 240, 240, 0.8);
+	    border-radius: 6px 6px 6px 6px;
+	    margin-bottom: 30px;
+	    padding: 10px;
+	}
+
+	.hero-unit h1 {
+		font-size: 1.8em;
+	}
+
+	.hero-unit h3 {
+		font-size: 1.2em;
+	}
+
+	.hero-unit h4 {
+		font-size: 0.8em;
+	}
+
+	.hero-unit p {
+		font-size: 0.75em;
+	}
+
+	.top-gap-l {
+		margin-top: 50px;
+	}
+
+	.top-gap-xl {
+		margin-top: 10px;
+	}
+}
+
+
+body {
+	background: none;
+}
+
+a {
+	color: #292;
+}
+
+footer {
+	position: fixed;
+    bottom: 0;
+	text-align: center;
+}
+
+footer a {
+	color: #aaa;
+}
+
+.light {
+	color: #fff;
+	font-weight: lighter;
+}
+
+.hud {
+	background: rgba(20, 20, 20, 0.8);
+	padding: 0 7px;
+	background: rgba(20, 20, 20, 0.8);
+	color: #aaa;
+}
 
 .square {
     width:92px;
@@ -7,7 +126,7 @@
     border: 1px solid black;
     text-align: center;
     display:table;
-    
+    background: rgba(255, 255, 255, 0.9);
 }
 
 .square span {

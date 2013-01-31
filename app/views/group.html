@@ -5,12 +5,16 @@
 	</h2>
 	<h3 ng-show="email.show"><small>Email: {{email.value}}</small></h3>
 </div>
-<div>
-    <div>Name: <input data-ng-change="calculateSquares()" data-ng-model="name" style="width:100px" type="text" placeholder="Insert Name"> Email: <input data-ng-change="calculateSquares()" data-ng-model="email" style="width:150px" type="text" placeholder="Insert Email"></div>
-    <br />
-    Squares Taken : {{squaresCount}}  Cost: ${{squaresCost}} <button data-ng-click="submitSquares()" class="btn btn-info">Submit</button>
+<div class="row-fluid hud">
+    <div class="span4">
+    	<h3 class="light" style="float: left;">Squares Taken : {{squaresCounts}}  Cost: ${{squaresCost}}</h3>
+    </div>
+	<div class="span8 top-gap">
+		<input data-ng-change="calculateSquares()" data-ng-model="name" style="width:100px" type="text" placeholder="Player Name">
+		<input data-ng-change="calculateSquares()" data-ng-model="email" style="width:150px" type="text" placeholder="Player Email">
+	</div>
 </div>
-<div id="squares">
+<div id="squares gapper">
     <ul class="unstyled">
         <li data-ng-click="squareClick(square)" data-ng-repeat="square in group.squares" class="square"><span>{{minimizedName(square)}}</span></li>
     </ul>
@@ -20,7 +24,7 @@
 	<div class="modal-header">
 		<h3>
 			Your the first one here
-			<small>You must be a admin</small>
+			<small>You must be an admin</small>
 		</h3>
 	</div>
 	<div class="modal-body">
