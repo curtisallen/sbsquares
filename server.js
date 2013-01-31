@@ -260,6 +260,7 @@ var SampleApp = function() {
                 if(!_.isNull(group)) {
                     console.log("Updating group");
                     group.update(req.body);
+                    res.json({success: true});
                 }
             });
         };
