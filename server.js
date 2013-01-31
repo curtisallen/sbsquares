@@ -336,7 +336,7 @@ var SampleApp = function() {
                 self.db.authenticate(MONGODB_DB_USERNAME, MONGODB_DB_PASSWORD, {authdb: "admin"}, function(err, res){
                     if(err) { console.log("Coudn't auth with mongo")}
                 });
-            } catch {
+            } catch(err) {
                 console.log('Error login');
             }
             self.db.collection('groups').update({groupId: req.body.groupId}, req.body, {w: 1}, function(err, results) {
