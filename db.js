@@ -27,7 +27,9 @@ var Group = new Schema({
 	adminPassword: String,
 	users: [User],
 	squares : [Square],
-	cost: Number
+	cost: Number,
+        xNumbers: [Number],
+        yNumbers: [Number]
         
 });
 

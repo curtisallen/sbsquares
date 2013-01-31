@@ -60,6 +60,13 @@ var SampleApp = function() {
         ;
     };
 
+    self.shuffle = function(o) {
+        for (var j, x, i = o.length; i; j = parseInt(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x)
+            ;
+        return o;
+    }
+    ;
+
 
     /**
      *  Populate the cache.
@@ -256,6 +263,45 @@ var SampleApp = function() {
             });
         };
 
+        self.routes['generateNumbers'] = function(req, res) {
+            console.log("request: "+JSON.stringify(req.query));
+            Group.findOne({groupId: req.query.groupId}).exec(function(err, group) {
+                if(group == null){
+                    var msg = "Invalid group id...";
+                    console.log(msg);
+                    var body = {};
+                    body.success = false;
+                    body.message = msg;
+                    res.setHeader('Content-Length', body.length);
+                    res.json(500, body);
+                }
+                if (req.query.password === group.adminPassword) {
+                    var xNumbers = [];
+                    var yNumbers = [];
+                    for (var i = 0; i <= 9; i++) {
+                        xNumbers.push(i);
+                        yNumbers.push(i);
+                    }
+                    var shuffledX = self.shuffle(xNumbers);
+                    var shuffledY = self.shuffle(yNumbers);
+                    
+                    group.xNumbers = shuffledX;
+                    group.yNumbers = shuffledY;
+                    group.save();
+                    res.json(group);
+                } else {
+                    var msg = "Invalid password...";
+                    console.log(msg);
+                    var body = {};
+                    body.success = false;
+                    body.message = msg;
+                    res.setHeader('Content-Length', body.length);
+                    res.json(500, body);
+                }
+
+            });
+        };
+
         self.routes['updateGroup'] = function(req, res) {
             if (_.isUndefined(req.session.gid)) {
                 var msg = "Login before you continue";
@@ -266,10 +312,10 @@ var SampleApp = function() {
             delete req.body["_id"];
             console.log("updating " + req.session.gid + " with " + req.body);
             var mc = mongodb.MongoClient;
-            mc.connect("mongodb://"+MONGODB_DB_HOST+":"+MONGODB_DB_PORT+"/"+MONGODB_DB_NAME, function(err,db){
+            mc.connect("mongodb://" + MONGODB_DB_HOST + ":" + MONGODB_DB_PORT + "/" + MONGODB_DB_NAME, function(err, db) {
                 var collection = db.collection('groups');
-                collection.update({groupId : req.body.groupId}, req.body, {w:1},function(err, results){
-                    console.log("callback from group update: "+JSON.stringify(err));
+                collection.update({groupId: req.body.groupId}, req.body, {w: 1}, function(err, results) {
+                    console.log("callback from group update: " + JSON.stringify(err));
                 });
             })
 //            Group.delete({groupId: req.session.gid});
@@ -304,11 +350,11 @@ var SampleApp = function() {
 //                            console.log("Error: could not update group ");
 //                        }
 //                    });
-                    
+
 
                     res.json({success: true});
                 } else {
-                    res.json(500,{success: false, msg: "Couldn't update group!"});
+                    res.json(500, {success: false, msg: "Couldn't update group!"});
                 }
             });
         };
@@ -341,6 +387,7 @@ var SampleApp = function() {
         self.app.get('/group/:groupId', self.routes['getGroup']);
         self.app.post('/saveAdmin', self.routes['saveAdmin']);
         self.app.post('/updateGroup', self.routes['updateGroup']);
+        self.app.get('/generateNumbers', self.routes['generateNumbers']);
     };
 
 
