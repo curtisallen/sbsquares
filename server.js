@@ -24,12 +24,7 @@ var SampleApp = function() {
 
     self.dbServer = new mongodb.Server(MONGODB_DB_HOST,parseInt(MONGODB_DB_PORT));
     self.db = new mongodb.Db(MONGODB_DB_NAME, self.dbServer, {auto_reconnect: true, w: 1});
-    self.db.open(function(err, db){
-      if(err){ console.log("Error connecting "); throw err };
-      self.db.authenticate(MONGODB_DB_USERNAME, MONGODB_DB_PASSWORD, {authdb: "admin"}, function(err, res){
-        if(err){ throw err };
-      });
-    });
+    
         
     var IP = process.env.OPENSHIFT_INTERNAL_IP || '127.0.0.1';
 
@@ -337,10 +332,18 @@ var SampleApp = function() {
             delete req.body["_id"];
             console.log("updating " + req.session.gid + " with " + req.body);        
             
-            self.db.collection('groups').update({groupId: req.body.groupId}, req.body, {w: 1}, function(err, results) {
-                console.log("callback from group update: " + JSON.stringify(err));
-                if(err) {throw err};
+            self.db.open(function(err, db){
+              if(err){ console.log("Error connecting "); throw err };
+              self.db.authenticate(MONGODB_DB_USERNAME, MONGODB_DB_PASSWORD, {authdb: "admin"}, function(err, res){
+                if(err){ throw err };
+
+                self.db.collection('groups').update({groupId: req.body.groupId}, req.body, {w: 1}, function(err, results) {
+                    console.log("callback from group update: " + JSON.stringify(err));
+                    if(err) {throw err};
+                });
+              });
             });
+            
             
             Group.findOne({groupId: req.session.gid}).exec(function(err, group) {
                 if (!_.isNull(group)) {
