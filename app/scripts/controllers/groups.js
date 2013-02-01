@@ -11,7 +11,7 @@ sbsquaresApp.controller('GroupsCtrl', function($scope, $http, $location, $log) {
     $scope.squaresCost = 0;
 
     $scope.showUserInfo = false;
-
+    $scope.showAlert = false;
     $scope.pattern = /^\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,3}$/;
 
     $scope.init = function() {
@@ -102,6 +102,7 @@ sbsquaresApp.controller('GroupsCtrl', function($scope, $http, $location, $log) {
                     .success(function(data, status, headers, config) {
                 //$log.log("Received group info: " + angular.toJson(data));
                 $scope.group = data;
+                $scope.showAlert = true;
                 // if there are no admins create one
                 if (_.isUndefined($scope.group.cost)) {
                     $('#adminPanel').modal('show');

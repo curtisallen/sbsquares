@@ -7,6 +7,10 @@
 	<p>
 		The square numbers will be generated before the big game so be sure to check back!
 	</p>
+	<div ng-show="showAlert" class="alert alert-success">
+  		<button type="button" class="close" data-dismiss="alert">&times;</button>
+  		<strong>Success</strong> Picks saved good luck!
+	</div>
 
 </div>
 <div class="row-fluid hud">
@@ -16,9 +20,9 @@
 	<div class="span8 top-gap">
 		<div class="form-inline">
 			<input data-ng-change="calculateSquares()" data-ng-model="name" style="width:100px" type="text" placeholder="Player Name">
-			<input data-ng-change="calculateSquares()" data-ng-model="email" style="width:150px" type="email" ng-pattern="pattern" placeholder="Player Email">
+			<input data-ng-change="calculateSquares()" data-ng-model="email" style="width:150px" type="email" ng-pattern="pattern" placeholder="Player Email" title="Select your squares before saving!">
 			<button class="btn btn-success" data-ng-click="submitSquares()">Save picks</button>
-			<span style="margin-left: 20px;"> Enter your info, click your picks, save 'em, win!</span>
+			<span style="margin-left: 20px;"> Enter your info, <strong>click your picks</strong>, save 'em, win!</span>
 		</div>
 
 	</div>
