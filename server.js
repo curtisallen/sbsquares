@@ -32,11 +32,7 @@ var SampleApp = function() {
     var User = mongoose.model('User');
     var Square = mongoose.model('Square');
 
-    /*self.dbServer = new mongodb.Server(MONGODB_DB_HOST,parseInt(MONGODB_DB_PORT));
-     self.db = new mongodb.Db('sbsquares', self.dbServer, {auto_reconnect: true, journal: false});
-     self.dbUser = MONGODB_DB_USERNAME;
-     self.dbPass = MONGODB_DB_PASSWORD;
-     */
+   
     self.ipaddr = IP;
     self.port = parseInt(process.env.OPENSHIFT_INTERNAL_PORT) || 3501;
     if (typeof self.ipaddr === "undefined") {
