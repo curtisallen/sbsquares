@@ -23,7 +23,7 @@ var SampleApp = function() {
     var MONGODB_DB_NAME = "sbsquares";
 
     self.dbServer = new mongodb.Server(MONGODB_DB_HOST,parseInt(MONGODB_DB_PORT));
-    self.db = new mongodb.Db(MONGODB_DB_NAME, self.dbServer, {auto_reconnect: true});
+    self.db = new mongodb.Db(MONGODB_DB_NAME, MONGODB_DB_HOST, {auto_reconnect: true});
 
         
     var IP = process.env.OPENSHIFT_INTERNAL_IP || '127.0.0.1';
