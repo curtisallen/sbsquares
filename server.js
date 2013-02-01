@@ -131,10 +131,10 @@ var SampleApp = function() {
         console.log("Connecting to db");
         self.db.open(function(err, db){
           if(err){ console.log("Error connecting "); throw err };
-          self.db.authenticate(MONGODB_DB_USERNAME, MONGODB_DB_PASSWORD, {authdb: "admin"}, function(err, res){
+          /**self.db.authenticate(MONGODB_DB_USERNAME, MONGODB_DB_PASSWORD, {authdb: "admin"}, function(err, res){
             if(err){ throw err };
             callback();
-          });
+          });**/
         });
       };
     /*  ================================================================  */
@@ -332,6 +332,7 @@ var SampleApp = function() {
                 console.log("callback from group update: " + JSON.stringify(err));
                 if(err) {throw err};
             });
+            
             
             
             Group.findOne({groupId: req.session.gid}).exec(function(err, group) {
