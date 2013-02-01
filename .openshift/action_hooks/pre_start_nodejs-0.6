@@ -26,8 +26,7 @@ echo 'Checking mongo'
 PIDS=`ps cax | grep mongod | grep -o '^[ ]*[0-9]*'`
 if [ -z "$PIDS" ]; then
   echo "Process not running." 1>&2
-else
-  echo "Starting mongo"
+  echo "Starting mongo" 1>&2
   $OPENSHIFT_DATA_DIR/mongodb-linux-x86_64-2.2.2/bin/mongod --dbpath $OPENSHIFT_DATA_DIR/data --nojournal --bind_ip $OPENSHIFT_MONGODB_DB_HOST --port $OPENSHIFT_MONGODB_DB_PORT
 fi
 
