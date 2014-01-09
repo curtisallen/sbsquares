@@ -13,7 +13,7 @@ var MONGODB_DB_NAME = "sbsquares";
 
 
 var User = new Schema({
-	name : {type: String, unique: true},
+	name : {type: String},
 	email: String
 });
 var Square = new Schema({

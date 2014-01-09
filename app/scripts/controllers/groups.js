@@ -78,22 +78,39 @@ sbsquaresApp.controller('GroupsCtrl', function($scope, $http, $location, $log) {
             alert('Insert an email first');
             return;
         }
-        if (square.owner == null || square.owner.name == null) {
-            // $log.log("adding name to square");
+        if(square.owner && square.owner[0]){
+            if(square.owner[0] !== $scope.name){
+                alert("You cannot change someone else's square. Please select another");
+                return;
+            } else if(square.owner === $scope.name){
+                $log.log("Clearing square");
+                    square.owner = [];      
+                    $scope.squaresCount = $scope.squaresCount - 1;
+                    $scope.squaresCost = $scope.squaresCount * $scope.group.cost;
+            }else {
+                $log.log("uhhh, how am I here");
+            }
+        } else {
             square.owner = [{name: $scope.name, email: $scope.email}];
             $scope.squaresCount = $scope.squaresCount + 1;
             $scope.squaresCost = $scope.squaresCount * $scope.group.cost;
-        } else {
-            if (square.owner != null && square.owner.length > 0) {
-                if (square.owner[0].name === $scope.name && square.owner[0].email === $scope.email) {
-                    square.owner = {};
-                    $scope.squaresCount = $scope.squaresCount - 1;
-                    $scope.squaresCost = $scope.squaresCount * $scope.group.cost;
-
-                }
-
-            }
         }
+//        if (square.owner == null || square.owner.name == null) {
+//            // $log.log("adding name to square");
+//            square.owner = [{name: $scope.name, email: $scope.email}];
+//            $scope.squaresCount = $scope.squaresCount + 1;
+//            $scope.squaresCost = $scope.squaresCount * $scope.group.cost;
+//        } else {
+//            if (square.owner != null && square.owner.length > 0) {
+//                if (square.owner[0].name === $scope.name && square.owner[0].email === $scope.email) {
+//                    square.owner = {};
+//                    $scope.squaresCount = $scope.squaresCount - 1;
+//                    $scope.squaresCost = $scope.squaresCount * $scope.group.cost;
+//
+//                }
+//
+//            }
+//        }
     }
 
     $scope.submitSquares = function() {

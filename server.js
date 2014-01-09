@@ -1,6 +1,6 @@
 #!/bin/env node
 //  OpenShift sample Node application
-        var express = require('express');
+var express = require('express');
 var fs = require('fs');
 var _ = require('underscore');
 var mongodb = require('mongodb');
@@ -22,17 +22,17 @@ var SampleApp = function() {
     var MONGODB_DB_PASSWORD = process.env.OPENSHIFT_MONGODB_DB_PASSWORD || '';
     var MONGODB_DB_NAME = "sbsquares";
 
-    self.dbServer = new mongodb.Server(MONGODB_DB_HOST,parseInt(MONGODB_DB_PORT));
+    self.dbServer = new mongodb.Server(MONGODB_DB_HOST, parseInt(MONGODB_DB_PORT));
     self.db = new mongodb.Db(MONGODB_DB_NAME, self.dbServer, {auto_reconnect: true, w: 1});
-    
-        
+
+
     var IP = process.env.OPENSHIFT_INTERNAL_IP || '127.0.0.1';
 
     var Group = mongoose.model('Group');
     var User = mongoose.model('User');
     var Square = mongoose.model('Square');
 
-   
+
     self.ipaddr = IP;
     self.port = parseInt(process.env.OPENSHIFT_INTERNAL_PORT) || 3501;
     if (typeof self.ipaddr === "undefined") {
@@ -74,7 +74,7 @@ var SampleApp = function() {
      */
     self.populateCache = function() {
         if (typeof self.zcache === "undefined") {
-            self.zcache = { 'index.html': ''};
+            self.zcache = {'index.html': ''};
         }
 
         //  Local cache for static content.
@@ -118,7 +118,7 @@ var SampleApp = function() {
         // Removed 'SIGPIPE' from the list - bugz 852598.
         ['SIGHUP', 'SIGINT', 'SIGQUIT', 'SIGILL', 'SIGTRAP', 'SIGABRT',
             'SIGBUS', 'SIGFPE', 'SIGUSR1', 'SIGSEGV', 'SIGUSR2', 'SIGTERM'
-                ].forEach(function(element, index, array) {
+        ].forEach(function(element, index, array) {
             process.on(element, function() {
                 self.terminator(element);
             });
@@ -127,16 +127,20 @@ var SampleApp = function() {
 
     // Logic to open a database connection. We are going to call this outside of app so it is available to all our functions inside.
 
-      self.connectDb = function(callback){
+    self.connectDb = function(callback) {
         console.log("Connecting to db");
-        self.db.open(function(err, db){
-          if(err){ console.log("Error connecting "); throw err };
-          /**self.db.authenticate(MONGODB_DB_USERNAME, MONGODB_DB_PASSWORD, {authdb: "admin"}, function(err, res){
-            if(err){ throw err };
-            callback();
-          });**/
+        self.db.open(function(err, db) {
+            if (err) {
+                console.log("Error connecting ");
+                throw err
+            }
+            ;
+            /**self.db.authenticate(MONGODB_DB_USERNAME, MONGODB_DB_PASSWORD, {authdb: "admin"}, function(err, res){
+             if(err){ throw err };
+             callback();
+             });**/
         });
-      };
+    };
     /*  ================================================================  */
     /*  App server functions (main app logic here).                       */
     /*  ================================================================  */
@@ -146,7 +150,7 @@ var SampleApp = function() {
      */
     self.createRoutes = function() {
 
-        self.routes = { };
+        self.routes = {};
 
         self.routes['/'] = function(req, res) {
             res.setHeader('Content-Type', 'text/html');
@@ -158,29 +162,30 @@ var SampleApp = function() {
 
             Group.findOne({groupId: req.body.groupId, password: req.body.password})
                     .exec(function(err, group) {
-                res.setHeader('Content-Type', 'application/json');
-                var body = {};
-                if (group) {
-                    // save session var
-                    req.session.gid = req.body.groupId;
-                    body.success = true;
-                    res.setHeader('Content-Length', body.length);
-                    res.json(body);
-                } else {
-                    var msg = "Invalid group id / password";
-                    // clear session
-                    req.session = null;
-                    console.log(msg);
-                    body.success = false;
-                    body.message = msg;
-                    res.setHeader('Content-Length', body.length);
-                    res.json(500, body);
-                }
-            });
+                        res.setHeader('Content-Type', 'application/json');
+                        var body = {};
+                        if (group) {
+                            // save session var
+                            req.session.gid = req.body.groupId;
+                            body.success = true;
+                            res.setHeader('Content-Length', body.length);
+                            res.json(body);
+                        } else {
+                            var msg = "Invalid group id / password";
+                            // clear session
+                            req.session = null;
+                            console.log(msg);
+                            body.success = false;
+                            body.message = msg;
+                            res.setHeader('Content-Length', body.length);
+                            res.json(500, body);
+                        }
+                    });
         };
         self.routes['createGroup'] = function(req, res) {
             console.log("creating group" + req.body);
             var groupInstance = new Group();
+
             for (var i = 0; i <= 9; i++) {
                 for (var j = 0; j <= 9; j++) {
                     var square = new Square();
@@ -189,9 +194,10 @@ var SampleApp = function() {
                     groupInstance.squares.push(square);
                 }
             }
+            console.log("groupid: "+req.body.groupId);
             groupInstance.groupId = req.body.groupId;
             groupInstance.password = req.body.password;
-
+            //console.log("Group instance: " + JSON.stringify(groupInstance));
             // make sure there isn't any other groups with this id before saving
             //console.log(groupInstance);
 
@@ -221,11 +227,23 @@ var SampleApp = function() {
                 } else {
                     // we can save it
                     // save session var
+                    console.log("persisting new group");
                     req.session.gid = req.body.groupId;
-                    groupInstance.save();
-                    body.success = true;
-                    res.setHeader('Content-Length', body.length);
-                    res.json(body);
+                    groupInstance.save(function(err, savedGroup) {
+                        if (err) {
+                            console.log("error saving group: "+err);
+                            body.success = false;
+                            body.message = "Error saving group";
+                            res.setHeader('Content-Length', body.length);
+                            res.json(body);
+                        } else {
+                            console.log("success saving group: "+JSON.stringify(savedGroup));
+                            body.success = true;
+                            res.setHeader('Content-Length', body.length);
+                            res.json(body);
+                        }
+                    });
+
                 }
 
             });
@@ -269,10 +287,10 @@ var SampleApp = function() {
             Group.findOne({groupId: req.session.gid}).exec(function(err, group) {
                 console.log("Saveing cost: " + req.body.cost);
                 //console.log("Saveing adminPassword: " + req.body.adminPassword);
-                if(!_.isNull(req.body.cost)) {
-                    group.cost = req.body.cost;    
+                if (!_.isNull(req.body.cost)) {
+                    group.cost = req.body.cost;
                 }
-                
+
                 //group.adminPassword = req.body.adminPassword;
                 group.save();
                 res.json({success: true});
@@ -280,9 +298,9 @@ var SampleApp = function() {
         };
 
         self.routes['generateNumbers'] = function(req, res) {
-            console.log("request: "+JSON.stringify(req.query));
+            console.log("request: " + JSON.stringify(req.query));
             Group.findOne({groupId: req.query.groupId}).exec(function(err, group) {
-                if(group == null){
+                if (group == null) {
                     var msg = "Invalid group id...";
                     console.log(msg);
                     var body = {};
@@ -300,7 +318,7 @@ var SampleApp = function() {
                     }
                     var shuffledX = self.shuffle(xNumbers);
                     var shuffledY = self.shuffle(yNumbers);
-                    
+
                     group.xNumbers = shuffledX;
                     group.yNumbers = shuffledY;
                     group.save();
@@ -326,15 +344,18 @@ var SampleApp = function() {
                 res.json(401, body);
             }
             delete req.body["_id"];
-            console.log("updating " + req.session.gid + " with " + req.body);        
+            console.log("updating " + req.session.gid + " with " + req.body);
 
             self.db.collection('groups').update({groupId: req.body.groupId}, req.body, {w: 1}, function(err, results) {
                 console.log("callback from group update: " + JSON.stringify(err));
-                if(err) {throw err};
+                if (err) {
+                    throw err
+                }
+                ;
             });
-            
-            
-            
+
+
+
             Group.findOne({groupId: req.session.gid}).exec(function(err, group) {
                 if (!_.isNull(group)) {
                     res.json({success: true});
@@ -387,7 +408,7 @@ var SampleApp = function() {
         // Create the express server and routes.
         //self.connectDb();
         self.initializeServer();
-        
+
     };
 
 
