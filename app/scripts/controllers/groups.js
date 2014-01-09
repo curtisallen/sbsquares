@@ -78,11 +78,12 @@ sbsquaresApp.controller('GroupsCtrl', function($scope, $http, $location, $log) {
             alert('Insert an email first');
             return;
         }
+        
         if(square.owner && square.owner[0]){
-            if(square.owner[0] !== $scope.name){
+            if(square.owner[0].name !== $scope.name){
                 alert("You cannot change someone else's square. Please select another");
                 return;
-            } else if(square.owner === $scope.name){
+            } else if(square.owner[0].name === $scope.name){
                 $log.log("Clearing square");
                     square.owner = [];      
                     $scope.squaresCount = $scope.squaresCount - 1;
