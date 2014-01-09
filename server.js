@@ -344,9 +344,27 @@ var SampleApp = function() {
 
         self.routes['updateSquare'] = function(req, res) {
             self.checkSession(req, res, "Login before you continue");
-            delete req.body["_id"];
-            self.db.collection('groups');
+            console.log(JSON.stringify(req.body));
+            // Square.findById(req.body["_id"]).exec(function(err, results) {
+            //     console.log("error: " + JSON.stringify(err) + " Results: " + JSON.stringify(results));
+
+            // });
+            self.db.collection('groups').find({"_id": req.body["_id"]}, function(err, results) {
+                console.log("error: " + JSON.stringify(err) + " Results: " + JSON.stringify(results));
+            });
+            Square.findByIdAndUpdate(req.body["_id"], 
+                {owner: [{name: req.body.owner[0].name, email: req.body.owner[0].email}] }, 
+                {w: 1}, 
+                function(err, results) {
+                    if(err)
+                        console.log("Could not update square:  " + JSON.stringify(err));
+
+                    res.json({'success': true});
+                }
+            );
+            
         };
+
         self.routes['updateGroup'] = function(req, res) {
             self.checkSession(req, res, "Login before you continue");
             delete req.body["_id"];
@@ -400,6 +418,7 @@ var SampleApp = function() {
         self.app.post('/saveAdmin', self.routes['saveAdmin']);
         self.app.post('/updateGroup', self.routes['updateGroup']);
         self.app.get('/generateNumbers', self.routes['generateNumbers']);
+        self.app.post('/updateSquare', self.routes['updateSquare']);
     };
 
 
