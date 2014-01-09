@@ -68,6 +68,16 @@ var SampleApp = function() {
     }
     ;
 
+    /**
+     * Check the session for a group id
+     **/
+    self.checkSession = function(req, res, msg) {
+        if (_.isUndefined(req.session.gid)) {
+            var body = {success: false, message: msg};
+            res.setHeader('Content-Length', body.length);
+            res.json(401, body);
+        }
+    }
 
     /**
      *  Populate the cache.
@@ -252,12 +262,7 @@ var SampleApp = function() {
         self.routes['getGroup'] = function(req, res) {
             console.log("Looking for this group id " + req.params.groupId);
             console.log("cookie: " + JSON.stringify(req.session));
-            if (_.isUndefined(req.session.gid)) {
-                var msg = "Login before you continue";
-                var body = {success: false, message: msg};
-                res.setHeader('Content-Length', body.length);
-                res.json(401, body);
-            }
+            self.checkSession(req, res, "Login before you continue");
             Group.findOne({groupId: req.params.groupId}).exec(function(err, group) {
                 if (err) {
                     var msg = "Invalid group id...";
@@ -283,6 +288,7 @@ var SampleApp = function() {
                 res.setHeader('Content-Length', body.length);
                 res.json(401, body);
             }
+            self.checkSession(req, res, "Login before you continue");
             //save password and cost
             Group.findOne({groupId: req.session.gid}).exec(function(err, group) {
                 console.log("Saveing cost: " + req.body.cost);
@@ -336,15 +342,15 @@ var SampleApp = function() {
             });
         };
 
-        self.routes['updateGroup'] = function(req, res) {
-            if (_.isUndefined(req.session.gid)) {
-                var msg = "Login before you continue";
-                var body = {success: false, message: msg};
-                res.setHeader('Content-Length', body.length);
-                res.json(401, body);
-            }
+        self.routes['updateSquare'] = function(req, res) {
+            self.checkSession(req, res, "Login before you continue");
             delete req.body["_id"];
-            console.log("updating " + req.session.gid + " with " + req.body);
+            self.db.collection('groups');
+        };
+        self.routes['updateGroup'] = function(req, res) {
+            self.checkSession(req, res, "Login before you continue");
+            delete req.body["_id"];
+            console.log("updating " + req.session.gid + " with this: " + JSON.stringify(req.body));
 
             self.db.collection('groups').update({groupId: req.body.groupId}, req.body, {w: 1}, function(err, results) {
                 console.log("callback from group update: " + JSON.stringify(err));
