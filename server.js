@@ -345,23 +345,14 @@ var SampleApp = function() {
         self.routes['updateSquare'] = function(req, res) {
             self.checkSession(req, res, "Login before you continue");
             console.log(JSON.stringify(req.body));
-            // Square.findById(req.body["_id"]).exec(function(err, results) {
-            //     console.log("error: " + JSON.stringify(err) + " Results: " + JSON.stringify(results));
-
-            // });
-            self.db.collection('groups').find({"_id": req.body["_id"]}, function(err, results) {
-                console.log("error: " + JSON.stringify(err) + " Results: " + JSON.stringify(results));
-            });
-            Square.findByIdAndUpdate(req.body["_id"], 
-                {owner: [{name: req.body.owner[0].name, email: req.body.owner[0].email}] }, 
-                {w: 1}, 
+            self.db.collection('groups').update({"squares._id": req.body["_id"]}, 
+                {$set: {'squares.$.owner.0': {"name": req.body["name"], "email": req.body["email"]} }}, 
+                {w: 1},
                 function(err, results) {
-                    if(err)
-                        console.log("Could not update square:  " + JSON.stringify(err));
-
-                    res.json({'success': true});
-                }
-            );
+                    if(err) {
+                        console.log("Error updating squares", err);
+                    }                    
+                });
             
         };
 

@@ -95,7 +95,7 @@ sbsquaresApp.controller('GroupsCtrl', function($scope, $http, $location, $log) {
             square.owner = [{name: $scope.name, email: $scope.email}];
             $scope.squaresCount = $scope.squaresCount + 1;
             $scope.squaresCost = $scope.squaresCount * $scope.group.cost;
-            $http.post('/updateSquare', square)
+            $http.post('/updateSquare', {"_id": square._id, "name": square.owner[0].name, "email": square.owner[0].email})
                 .error(function(err) {
                     $log.log("error saving square: " + err);
                 });
