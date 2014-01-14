@@ -85,6 +85,10 @@ sbsquaresApp.controller('GroupsCtrl', function($scope, $http, $location, $log) {
                 return;
             } else if(square.owner[0].name === $scope.name){
                 $log.log("Clearing square");
+                $http.post('/removeOwner', {"_id": square._id})
+                    .error(function(err) {
+                        $log.log("error removing square");
+                    });
                     square.owner = [];      
                     $scope.squaresCount = $scope.squaresCount - 1;
                     $scope.squaresCost = $scope.squaresCount * $scope.group.cost;

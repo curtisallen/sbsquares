@@ -345,15 +345,44 @@ var SampleApp = function() {
         self.routes['updateSquare'] = function(req, res) {
             self.checkSession(req, res, "Login before you continue");
             console.log(JSON.stringify(req.body));
-            self.db.collection('groups').update({"squares._id": req.body["_id"]}, 
-                {$set: {'squares.$.owner.0': {"name": req.body["name"], "email": req.body["email"]} }}, 
+            self.db.collection('groups').find({"squares._id": req.body["_id"]}, 
+                {'squares.$': 1}, 
+                {w: 1},
+                function(err, results) {
+                    if(results && results.length !== 0) {
+                        // this square doesn't have an owner update it now
+                        self.db.collection('groups').update({"squares._id": req.body["_id"]}, 
+                            {$set: {'squares.$.owner.0': {"name": req.body["name"], "email": req.body["email"]} }}, 
+                            {w: 1},
+                            function(err, results) {
+                                if(err) {
+                                    console.log("Error updating squares", err);
+                                }                    
+                            });
+                        res.json({"success": true});
+                    } else {
+                        res.json(404, {"success": false, "message": "Square already taken"});    
+                    }
+                    
+                });
+            
+            
+        };
+
+        self.routes['removeOwner'] = function(req, res) {
+            self.checkSession(req, res, "Login before you can remove owner");
+            console.log(JSON.stringify(req.body));
+            self.db.collection('groups').update({"squares._id": req.body["_id"]},
+                {$set: {'squares.$.owner.0': {} }},
                 {w: 1},
                 function(err, results) {
                     if(err) {
-                        console.log("Error updating squares", err);
-                    }                    
-                });
-            
+                        console.log("Error removing owner", err);
+                    } else {
+                        res.json({"success": true});
+                    }
+                } 
+            );
         };
 
         self.routes['updateGroup'] = function(req, res) {
@@ -410,6 +439,7 @@ var SampleApp = function() {
         self.app.post('/updateGroup', self.routes['updateGroup']);
         self.app.get('/generateNumbers', self.routes['generateNumbers']);
         self.app.post('/updateSquare', self.routes['updateSquare']);
+        self.app.post('/removeOwner', self.routes['removeOwner']);
     };
 
 
