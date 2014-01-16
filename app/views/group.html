@@ -1,17 +1,33 @@
-<div class="hero-unit" ng-init="init()">
-	<h2>
-		Group: {{group.groupId}}
-		<small>password: {{group.password}}</small>
-	</h2>
-	<h3 ng-show="email.show"><small>Email: {{email.value}}</small></h3>
-	<p>
-		The square numbers will be generated before the big game so be sure to check back!
-	</p>
+<div class="hero-unit top-gap" ng-init="init()">
+	<div id="groupInfo">
+		<h2>
+			Group: {{group.groupId}}
+			<small>password: {{group.password}}</small>
+		</h2>
+		<h3 ng-show="email.show"><small>Email: {{email.value}}</small></h3>
+		<p>
+			The square numbers will be generated before the big game so be sure to check back!
+		</p>
+	</div>
+	<div id="adminPanel" class="hide">
+		<h2>Before we get started</h2>
+		<form class="form-inline">
+			<span>
+				How much should each square cost:
+				<div class="input-append">
+					<input class="span1" type="text" ng-model="cost" placeholder="10">
+					<span class="add-on">$</span>
+				</div>
+			</span>
+			<p>
+				<button type="submit" class="btn btn-primary" ng-click="saveAdmin()">Save</button>
+			</p>
+		</form>
+	</div>
 	<div ng-show="showAlert" class="alert alert-success">
   		<button type="button" class="close" data-dismiss="alert">&times;</button>
   		<strong>Success</strong> Picks saved good luck!
 	</div>
-
 </div>
 <div class="row-fluid hud">
     <div class="span4">
@@ -39,29 +55,4 @@
     	<li data-ng-repeat="number in group.xNumbers" class="tit-square legend">{{number}}</li>
         <li data-ng-click="squareClick(square)" data-ng-repeat="square in group.squares" class="square"><span>{{minimizedName(square)}}</span></li>
     </ul>
-</div>
-<div id="adminPanel" ng-hide="true" class="modal hide fade">
-	<div class="modal-header">
-		<h3>
-			Your the first one here
-			<small>You must be an admin</small>
-		</h3>
-	</div>
-	<div class="modal-body">
-		<form class="form-inline">
-			<!--p>
-				What should the admin password be:
-				<input class="span2" type="password" ng-model="adminPassword" placeholder="pippylongstockings">
-			</p-->
-			<span>
-				How much should each square cost:
-				<div class="input-append">
-					<input class="span1" type="text" ng-model="cost" placeholder="10">
-					<span class="add-on">$</span>
-				</div>
-			</span>
-			<p>
-				<button type="submit" class="btn btn-primary" ng-click="saveAdmin()">Save</button>
-			</p>
-	</div>
 </div>

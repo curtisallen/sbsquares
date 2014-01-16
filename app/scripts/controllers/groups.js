@@ -23,7 +23,8 @@ sbsquaresApp.controller('GroupsCtrl', function($scope, $http, $location, $log) {
             // $log.log("square 0" + angular.toJson($scope.group.squares[0]));
             // if there are no admins create one
             if (_.isUndefined($scope.group.cost)) {
-                $('#adminPanel').modal('show');
+                $('#groupInfo').addClass('hide');
+                $('#adminPanel').removeClass('hide');
             }
             //$log.log("group: " + angular.toJson($scope.group));
         }).error(function(data, status, headers, config) {
@@ -131,7 +132,8 @@ sbsquaresApp.controller('GroupsCtrl', function($scope, $http, $location, $log) {
                 $scope.showAlert = true;
                 // if there are no admins create one
                 if (_.isUndefined($scope.group.cost)) {
-                    $('#adminPanel').modal('show');
+                    $('#adminPanel').removeClass('hide');
+                    $('#groupInfo').addClass('hide');
                 }
                 //$log.log("group: " + angular.toJson($scope.group));
             }).error(function(data, status, headers, config) {
@@ -152,14 +154,16 @@ sbsquaresApp.controller('GroupsCtrl', function($scope, $http, $location, $log) {
                 $scope.group = data;
                 // if there are no admins create one
                 if (_.isUndefined($scope.group.cost)) {
-                    $('#adminPanel').modal('show');
+                    $('#groupInfo').addClass('hide');
+                    $('#adminPanel').removeClass('hide');
                 }
                 //$log.log("group: " + angular.toJson($scope.group));
             }).error(function(data, status, headers, config) {
                 // redirect becuase there is no session
                 $location.url('/');
             });
-            $('#adminPanel').modal('hide');
+            $('#groupInfo').removeClass('hide');
+            $('#adminPanel').addClass('hide');
         })
                 .error(function(data, status, headers, config) {
             // $log.log("Couldn't save admin info!");
