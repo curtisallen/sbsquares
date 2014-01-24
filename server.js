@@ -78,6 +78,21 @@ var SampleApp = function() {
             res.json(401, body);
         }
     }
+    
+    self.groupHasEmptySquares = function(groupId, callback){
+        Square.find({groupId: groupId, name : {"$exists": false}}, function(err, squares){
+            if(err){
+                console.log("Error determing if group has empty squares!");
+                callback(false);
+            } 
+            if(squares && squares.length > 0){
+                callback(true);
+            } else {
+                callback(false);
+            }
+            
+        });
+    }
 
     /**
      *  Populate the cache.
