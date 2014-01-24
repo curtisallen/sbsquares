@@ -18,16 +18,16 @@ sbsquaresApp.controller('GroupsCtrl', function($scope, $http, $location, $log) {
         // $log.log("group init called");
         $http.get($location.url())
                 .success(function(data, status, headers, config) {
-            //$log.log("Received group info: " + angular.toJson(data));
-            $scope.group = data;
-            // $log.log("square 0" + angular.toJson($scope.group.squares[0]));
-            // if there are no admins create one
-            if (_.isUndefined($scope.group.cost)) {
-                $('#groupInfo').addClass('hide');
-                $('#adminPanel').removeClass('hide');
-            }
-            //$log.log("group: " + angular.toJson($scope.group));
-        }).error(function(data, status, headers, config) {
+                    $log.log("Received group info: " + angular.toJson(data, true));
+                    $scope.group = data;
+                    // $log.log("square 0" + angular.toJson($scope.group.squares[0]));
+                    // if there are no admins create one
+                    if (_.isUndefined($scope.group.cost)) {
+                        $('#groupInfo').addClass('hide');
+                        $('#adminPanel').removeClass('hide');
+                    }
+                    //$log.log("group: " + angular.toJson($scope.group));
+                }).error(function(data, status, headers, config) {
             // redirect becuase there is no session
             $location.url('/');
         });
@@ -55,18 +55,21 @@ sbsquaresApp.controller('GroupsCtrl', function($scope, $http, $location, $log) {
     }
 
     $scope.minimizedName = function(square) {
-        if (square.owner == null || square.owner.length == 0) {
+        $log.log("minimizing: "+angular.toJson(square));
+        
+        if(!square.name){
             return;
         }
-        var name = square.owner[0].name;
-        if (name == null | name === "") {
-            return "";
+        if (square.name.length === 0) {
+            return;
         }
+        
         // $log.log("min name called");
-        if (name.length > 12) {
-            return name.substring(0, 8) + "...";
+        if (square.name.length > 12) {
+            return square.name.substring(0, 8) + "...";
         } else {
-            return name;
+            $log.log("returning something: "+square.name);
+            return square.name;
         }
     }
 
@@ -79,31 +82,32 @@ sbsquaresApp.controller('GroupsCtrl', function($scope, $http, $location, $log) {
             alert('Insert an email first');
             return;
         }
-        
-        if(square.owner && square.owner[0]){
-            if(square.owner[0].name !== $scope.name){
+
+        if (square.name) {
+            if (square.name !== $scope.name) {
                 alert("You cannot change someone else's square. Please select another");
                 return;
-            } else if(square.owner[0].name === $scope.name){
+            } else if (square.name === $scope.name) {
                 $log.log("Clearing square");
-                $http.post('/removeOwner', {"_id": square._id})
-                    .error(function(err) {
-                        $log.log("error removing square");
-                    });
-                    square.owner = [];      
-                    $scope.squaresCount = $scope.squaresCount - 1;
-                    $scope.squaresCost = $scope.squaresCount * $scope.group.cost;
-            }else {
+                $http.post('/removeOwner', {groupId: $scope.group.groupId, x: square.x, y: square.y})
+                        .error(function(err) {
+                            $log.log("error removing square");
+                        });
+                square.name = null;
+                $scope.squaresCount = $scope.squaresCount - 1;
+                $scope.squaresCost = $scope.squaresCount * $scope.group.cost;
+            } else {
                 $log.log("uhhh, how am I here");
             }
         } else {
-            square.owner = [{name: $scope.name, email: $scope.email}];
+            square.name = $scope.name;
+            square.email = $scope.email;
             $scope.squaresCount = $scope.squaresCount + 1;
             $scope.squaresCost = $scope.squaresCount * $scope.group.cost;
-            $http.post('/updateSquare', {"_id": square._id, "name": square.owner[0].name, "email": square.owner[0].email})
-                .error(function(err) {
-                    $log.log("error saving square: " + err);
-                });
+            $http.post('/updateSquare', {groupId: $scope.group.groupId, x: square.x, y: square.y, "name": square.name, "email": square.email})
+                    .error(function(err) {
+                        $log.log("error saving square: " + err);
+                    });
         }
 //        if (square.owner == null || square.owner.name == null) {
 //            // $log.log("adding name to square");
@@ -127,16 +131,16 @@ sbsquaresApp.controller('GroupsCtrl', function($scope, $http, $location, $log) {
         $http.post("/updateGroup", $scope.group).success(function(data, status, headers, config) {
             $http.get($location.url())
                     .success(function(data, status, headers, config) {
-                //$log.log("Received group info: " + angular.toJson(data));
-                $scope.group = data;
-                $scope.showAlert = true;
-                // if there are no admins create one
-                if (_.isUndefined($scope.group.cost)) {
-                    $('#adminPanel').removeClass('hide');
-                    $('#groupInfo').addClass('hide');
-                }
-                //$log.log("group: " + angular.toJson($scope.group));
-            }).error(function(data, status, headers, config) {
+                        //$log.log("Received group info: " + angular.toJson(data));
+                        $scope.group = data;
+                        $scope.showAlert = true;
+                        // if there are no admins create one
+                        if (_.isUndefined($scope.group.cost)) {
+                            $('#adminPanel').removeClass('hide');
+                            $('#groupInfo').addClass('hide');
+                        }
+                        //$log.log("group: " + angular.toJson($scope.group));
+                    }).error(function(data, status, headers, config) {
                 // redirect becuase there is no session
                 $location.url('/');
             });
@@ -148,26 +152,26 @@ sbsquaresApp.controller('GroupsCtrl', function($scope, $http, $location, $log) {
     $scope.saveAdmin = function() {
         $http.post('/saveAdmin', {cost: $scope.cost})
                 .success(function(data, status, headers, config) {
-            $http.get($location.url())
-                    .success(function(data, status, headers, config) {
-                //$log.log("Received group info: " + angular.toJson(data));
-                $scope.group = data;
-                // if there are no admins create one
-                if (_.isUndefined($scope.group.cost)) {
-                    $('#groupInfo').addClass('hide');
-                    $('#adminPanel').removeClass('hide');
-                }
-                //$log.log("group: " + angular.toJson($scope.group));
-            }).error(function(data, status, headers, config) {
-                // redirect becuase there is no session
-                $location.url('/');
-            });
-            $('#groupInfo').removeClass('hide');
-            $('#adminPanel').addClass('hide');
-        })
+                    $http.get($location.url())
+                            .success(function(data, status, headers, config) {
+                                //$log.log("Received group info: " + angular.toJson(data));
+                                $scope.group = data;
+                                // if there are no admins create one
+                                if (_.isUndefined($scope.group.cost)) {
+                                    $('#groupInfo').addClass('hide');
+                                    $('#adminPanel').removeClass('hide');
+                                }
+                                //$log.log("group: " + angular.toJson($scope.group));
+                            }).error(function(data, status, headers, config) {
+                        // redirect becuase there is no session
+                        $location.url('/');
+                    });
+                    $('#groupInfo').removeClass('hide');
+                    $('#adminPanel').addClass('hide');
+                })
                 .error(function(data, status, headers, config) {
-            // $log.log("Couldn't save admin info!");
-            $location.url('/');
-        });
+                    // $log.log("Couldn't save admin info!");
+                    $location.url('/');
+                });
     };
 });
