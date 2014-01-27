@@ -15,9 +15,8 @@
 
 	.hero-unit {
 		background-color: rgba(240, 240, 240, 0.8);
-	    border-radius: 6px 6px 6px 6px;
-	    margin-bottom: 30px;
-	    padding: 60px;
+	    border-radius: 5px 5px 5px 5px;
+	    padding: 0px;
 	}
 
 	.hero-unit p {
@@ -201,17 +200,17 @@ footer a {
 	height: 92px;
 }
 
-#ravens {
-	background: #fff;
-	color: #939;
+#broncos {
+	background: #F15623;
+	color: #001F52;
 	font-size: 1.8em;
 	text-align: center;
 	padding: 10px 0;
 }
 
-#fourtynineers {
-	background: #992;
-	color: #822;
+#seahawks {
+	background: #0F1A36;
+	color: #69BD28;
 	font-size: 1.8em;
 	text-align: center;
 	padding: 10px 0;	

@@ -1,34 +1,46 @@
-<div class="hero-unit top-gap" ng-init="init()">
+<div class="hero-unit top-gap row" ng-init="init()">
 	<div id="groupInfo">
-		<h2>
-			Group: {{group.groupId}}
-			<small>password: {{group.password}}</small>
-		</h2>
-		<h3 ng-show="email.show"><small>Email: {{email.value}}</small></h3>
-		<p>
-			The square numbers will be generated before the big game so be sure to check back!
-		</p>
-	</div>
-	<div id="adminPanel" class="hide">
-		<h2>Before we get started</h2>
-		<form class="form-inline">
-			<span>
-				How much should each square cost:
-				<div class="input-append">
-					<input class="span1" type="text" ng-model="cost" placeholder="10">
-					<span class="add-on">$</span>
-				</div>
-			</span>
+		<div class="span6">
+			<h3>
+				{{group.groupId}}
+				<small>${{group.cost}} per square</small>
+			</h3>
+			<h3 ng-show="email.show"><small>Email: {{email.value}}</small></h3>
 			<p>
-				<button type="submit" class="btn btn-primary" ng-click="saveAdmin()">Save</button>
+				The square numbers will be generated before the big game so be sure to check back!
 			</p>
-		</form>
+		</div>
+		<div class="span6">
+			<h4>Enter your name and email, then click to pick</h4>
+			<div class="form-inline top-gap">
+				<input data-ng-change="calculateSquares()" data-ng-model="name" style="width:100px" type="text" placeholder="Player Name">
+				<input data-ng-change="calculateSquares()" data-ng-model="email" style="width:150px" type="email" ng-pattern="pattern" placeholder="Player Email" title="Select your squares before saving!">
+			</div>
+		</div>
 	</div>
-	<div ng-show="showAlert" class="alert alert-success">
-  		<button type="button" class="close" data-dismiss="alert">&times;</button>
-  		<strong>Success</strong> Picks saved good luck!
-	</div>
+	<div class="span12">
+		<div id="adminPanel" class="hide">
+			<h2>Before we get started</h2>
+			<form class="form-inline">
+				<span>
+					How much should each square cost:
+					<div class="input-append">
+						<input class="span1" type="text" ng-model="cost" placeholder="10">
+						<span class="add-on">$</span>
+					</div>
+				</span>
+				<p>
+					<button type="submit" class="btn btn-primary" ng-click="saveAdmin()">Save</button>
+				</p>
+			</form>
+		</div>
+		<div ng-show="showAlert" class="alert alert-success">
+	  		<button type="button" class="close" data-dismiss="alert">&times;</button>
+	  		<strong>Success</strong> Picks saved good luck!
+		</div>
+	</div>		
 </div>
+<!--
 <div class="row-fluid hud">
     <div class="span4">
     	<h3 class="light" style="float: left;">Squares Taken : {{squaresCount}}  Cost: ${{squaresCost}}</h3>
@@ -42,9 +54,10 @@
 
 	</div>
 </div>
+-->
 
-<div id="ravens" class="top-gap">Baltimore Ravens</div>
-<div id="fourtynineers" class="rotate">San Francisco 49ers</div>
+<div id="broncos" class="top-gap">Denver Broncos</div>
+<div id="seahawks" class="rotate">Seattle Seahawks</div>
 <div id="vert-row" class="legend">
 	<ul>
 		<li data-ng-repeat="number in group.yNumbers">{{number}}</li>
