@@ -19,14 +19,15 @@ var User = new Schema({
 var Square = new Schema({
    x : Number,
    y : Number,
-   owner : [User]
+   name: String,
+   email: String,
+   groupId: String
 });
 var Group = new Schema({
 	groupId : {type: String, unique: true},
 	password: String,
 	adminPassword: String,
 	users: [User],
-	squares : [Square],
 	cost: Number,
         xNumbers: [Number],
         yNumbers: [Number]

@@ -79,6 +79,21 @@ var SampleApp = function() {
         }
     }
 
+    self.groupHasEmptySquares = function(groupId, callback) {
+        Square.find({groupId: groupId, name: {"$exists": false}}, function(err, squares) {
+            if (err) {
+                console.log("Error determing if group has empty squares!");
+                callback(false);
+            }
+            if (squares && squares.length > 0) {
+                callback(true);
+            } else {
+                callback(false);
+            }
+
+        });
+    }
+
     /**
      *  Populate the cache.
      */
@@ -196,17 +211,20 @@ var SampleApp = function() {
             console.log("creating group" + req.body);
             var groupInstance = new Group();
 
+
+            console.log("groupid: " + req.body.groupId);
+            groupInstance.groupId = req.body.groupId;
+            groupInstance.password = req.body.password;
+
             for (var i = 0; i <= 9; i++) {
                 for (var j = 0; j <= 9; j++) {
                     var square = new Square();
                     square.x = i;
                     square.y = j;
-                    groupInstance.squares.push(square);
+                    square.groupId = groupInstance.groupId;
+                    square.save();
                 }
             }
-            console.log("groupid: "+req.body.groupId);
-            groupInstance.groupId = req.body.groupId;
-            groupInstance.password = req.body.password;
             //console.log("Group instance: " + JSON.stringify(groupInstance));
             // make sure there isn't any other groups with this id before saving
             //console.log(groupInstance);
@@ -241,13 +259,13 @@ var SampleApp = function() {
                     req.session.gid = req.body.groupId;
                     groupInstance.save(function(err, savedGroup) {
                         if (err) {
-                            console.log("error saving group: "+err);
+                            console.log("error saving group: " + err);
                             body.success = false;
                             body.message = "Error saving group";
                             res.setHeader('Content-Length', body.length);
                             res.json(body);
                         } else {
-                            console.log("success saving group: "+JSON.stringify(savedGroup));
+                            console.log("success saving group: " + JSON.stringify(savedGroup));
                             body.success = true;
                             res.setHeader('Content-Length', body.length);
                             res.json(body);
@@ -273,8 +291,37 @@ var SampleApp = function() {
                     res.setHeader('Content-Length', body.length);
                     res.json(500, body);
                 } else {
-                    //console.log("group: " + group);
-                    res.json(group);
+                    console.log("Looking up squares for: " + group.groupId);
+                    Square.find({groupId: group.groupId}, function(err, squares) {
+                        //console.log("group: " + group);
+                        if (err) {
+                            console.log("Error querying groups: " + err);
+                        }
+                        if (!squares) {
+                            squares = [];
+                        }
+                        console.log("adding " + squares.length + "squares to group");
+                        retObj = {groupId: group.groupId, cost: group.cost, password: group.password};
+                        retObj.squares = [];
+                        var squareMap = {};
+                        for (var z = 0; z < squares.length; z++) {
+                            var square = squares[z];
+                            if(!squareMap[square.x]){
+                                squareMap[square.x] = {};
+                            }
+                            squareMap[square.x][square.y] = {x: square.x, y: square.y, name: square.name, email: square.email};
+                            
+                        }
+                        for(var i = 0; i < 10; i++){
+                            for(var j = 0; j < 10; j++){
+                                retObj.squares.push(squareMap[i][j]);
+                            }
+                        }
+
+                        console.log("returning groups: " + JSON.stringify(retObj));
+                        res.json(retObj);
+                    })
+
                 }
 
             });
@@ -345,43 +392,52 @@ var SampleApp = function() {
         self.routes['updateSquare'] = function(req, res) {
             self.checkSession(req, res, "Login before you continue");
             console.log(JSON.stringify(req.body));
-            self.db.collection('groups').find({"squares._id": req.body["_id"]}, 
-                {'squares.$': 1}, 
-                {w: 1},
-                function(err, results) {
-                    if(results && results.length !== 0) {
-                        // this square doesn't have an owner update it now
-                        self.db.collection('groups').update({"squares._id": req.body["_id"]}, 
-                            {$set: {'squares.$.owner.0': {"name": req.body["name"], "email": req.body["email"]} }}, 
-                            {w: 1},
-                            function(err, results) {
-                                if(err) {
-                                    console.log("Error updating squares", err);
-                                }                    
-                            });
-                        res.json({"success": true});
-                    } else {
-                        res.json(404, {"success": false, "message": "Square already taken"});    
-                    }
-                    
-                });
-            
-            
+            Square.find({x: req.body.x, y: req.body.y, groupId: req.body.groupId}, function(err, squares) {
+                for (var i = 0; i < squares.length; i++) {
+                    var square = squares[i];
+                    square.name = req.body.name;
+                    square.email = req.body.email;
+                    square.save();
+                }
+                res.json({"success": true});
+            });
+//            self.db.collection('groups').find({"squares._id": req.body["_id"]},
+//            {'squares.$': 1},
+//            {w: 1},
+//            function(err, results) {
+//                if (results && results.length !== 0) {
+//                    // this square doesn't have an owner update it now
+//                    self.db.collection('groups').update({"squares._id": req.body["_id"]},
+//                    {$set: {'squares.$.owner.0': {"name": req.body["name"], "email": req.body["email"]}}},
+//                    {w: 1},
+//                    function(err, results) {
+//                        if (err) {
+//                            console.log("Error updating squares", err);
+//                        }
+//                    });
+//                    res.json({"success": true});
+//                } else {
+//                    res.json(404, {"success": false, "message": "Square already taken"});
+//                }
+//
+//            });
+
+
         };
 
         self.routes['removeOwner'] = function(req, res) {
             self.checkSession(req, res, "Login before you can remove owner");
             console.log(JSON.stringify(req.body));
             self.db.collection('groups').update({"squares._id": req.body["_id"]},
-                {$set: {'squares.$.owner.0': {} }},
-                {w: 1},
-                function(err, results) {
-                    if(err) {
-                        console.log("Error removing owner", err);
-                    } else {
-                        res.json({"success": true});
-                    }
-                } 
+            {$set: {'squares.$.owner.0': {}}},
+            {w: 1},
+            function(err, results) {
+                if (err) {
+                    console.log("Error removing owner", err);
+                } else {
+                    res.json({"success": true});
+                }
+            }
             );
         };
 
