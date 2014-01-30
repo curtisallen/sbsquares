@@ -3,7 +3,7 @@
 var express = require('express');
 var fs = require('fs');
 var _ = require('underscore');
-//var mongodb = require('mongodb');
+var mongodb = require('mongodb');
 var mongoose = require('./db').getMongoose();
 var MongoStore = require('connect-mongo')(express);
 
