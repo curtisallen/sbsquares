@@ -44,6 +44,8 @@ mongoose.connect('mongodb://' + MONGODB_DB_HOST + '/' + MONGODB_DB_NAME ,{
 	//server 	: MONGODB_DB_HOST
 });
 
+mongoose.connect(process.env.OPENSHIFT_MONGODB_DB_URL);
+
 exports.getMongoose = function() {
 	return mongoose;
 }

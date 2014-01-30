@@ -22,8 +22,8 @@ var SampleApp = function() {
     var MONGODB_DB_PASSWORD = process.env.OPENSHIFT_MONGODB_DB_PASSWORD || '';
     var MONGODB_DB_NAME = "sbsquares";
 
-    self.dbServer = new mongodb.Server(MONGODB_DB_HOST, parseInt(MONGODB_DB_PORT));
-    self.db = new mongodb.Db(MONGODB_DB_NAME, self.dbServer, {auto_reconnect: true, w: 1});
+    //self.dbServer = new mongodb.Server(MONGODB_DB_HOST, parseInt(MONGODB_DB_PORT));
+    //self.db = new mongodb.Db(MONGODB_DB_NAME, self.dbServer, {auto_reconnect: true, w: 1});
 
 
     var IP = process.env.OPENSHIFT_INTERNAL_IP || '127.0.0.1';
@@ -160,8 +160,8 @@ var SampleApp = function() {
                 throw err
             };
             console.log("Authenticating with: "+MONGODB_DB_USERNAME+", pword: "+MONGODB_DB_PASSWORD)
-            self.db.authenticate(MONGODB_DB_USERNAME, MONGODB_DB_PASSWORD, {authdb: "admin"}, function(err, res){
-             if(err){ throw err };
+            db.authenticate(MONGODB_DB_USERNAME, MONGODB_DB_PASSWORD, {authdb: "admin"}, function(err, res){
+             if(err){ console.log("AUTH error: "+JSON.stringify(err));throw err };
              if(callback){
                 callback();
              }
@@ -536,6 +536,6 @@ var SampleApp = function() {
  */
 var zapp = new SampleApp();
 zapp.initialize();
-//zapp.start();
-zapp.connectDb(zapp.start());
+zapp.start();
+//zapp.connectDb(zapp.start());
 
