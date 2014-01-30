@@ -162,7 +162,9 @@ var SampleApp = function() {
             ;
             self.db.authenticate(MONGODB_DB_USERNAME, MONGODB_DB_PASSWORD, {authdb: "admin"}, function(err, res){
              if(err){ throw err };
-             callback();
+             if(callback){
+                callback();
+             }
              });
         });
     };
