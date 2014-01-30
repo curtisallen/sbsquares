@@ -37,14 +37,14 @@ var Group = new Schema({
 mongoose.model('Group', Group);
 mongoose.model('User', User);
 mongoose.model('Square', Square);
-mongoose.connect('mongodb://' + MONGODB_DB_HOST + '/' + MONGODB_DB_NAME ,{
-	//db  	: MONGODB_DB_NAME,
-	user 	: MONGODB_DB_USERNAME,
-	pass 	: MONGODB_DB_PASSWORD,
-	//server 	: MONGODB_DB_HOST
-});
-
-mongoose.connect(process.env.OPENSHIFT_MONGODB_DB_URL);
+//mongoose.connect('mongodb://' + MONGODB_DB_HOST + '/' + MONGODB_DB_NAME ,{
+//	//db  	: MONGODB_DB_NAME,
+//	user 	: MONGODB_DB_USERNAME,
+//	pass 	: MONGODB_DB_PASSWORD,
+//	//server 	: MONGODB_DB_HOST
+//});
+console.log("Connecting to: "+process.env.OPENSHIFT_MONGODB_DB_URL);
+mongoose.connect(process.env.OPENSHIFT_MONGODB_DB_URL+MONGODB_DB_NAME);
 
 exports.getMongoose = function() {
 	return mongoose;
