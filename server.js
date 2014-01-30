@@ -488,7 +488,7 @@ var SampleApp = function() {
         // conf
         self.app.use(express.bodyParser());
         self.app.use(express.cookieParser());
-        self.app.use(express.session({secret: '4265d78bcf30e9f7f9d3963adf982699'}));
+        self.app.use(express.cookieSession({secret: '4265d78bcf30e9f7f9d3963adf982699'}));
         // routes
         self.app.get('/', self.routes['/']);
         self.app.post('/createGroup', self.routes['createGroup']);
