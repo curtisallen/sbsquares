@@ -43,8 +43,9 @@ mongoose.model('Square', Square);
 //	pass 	: MONGODB_DB_PASSWORD,
 //	//server 	: MONGODB_DB_HOST
 //});
-console.log("Connecting to: "+process.env.OPENSHIFT_MONGODB_DB_URL);
-mongoose.connect(process.env.OPENSHIFT_MONGODB_DB_URL+MONGODB_DB_NAME, {keepAlive : 1});
+var connectString = 'mongodb://' + MONGODB_DB_HOST +":"+MONGODB_DB_PORT+ '/' + MONGODB_DB_NAME;
+console.log("Connecting to: "+connectString);
+mongoose.connect(connectString, {keepAlive : 1});
 
 exports.getMongoose = function() {
 	return mongoose;
