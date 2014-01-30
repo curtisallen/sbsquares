@@ -160,10 +160,10 @@ var SampleApp = function() {
                 throw err
             }
             ;
-            /**self.db.authenticate(MONGODB_DB_USERNAME, MONGODB_DB_PASSWORD, {authdb: "admin"}, function(err, res){
+            self.db.authenticate(MONGODB_DB_USERNAME, MONGODB_DB_PASSWORD, {authdb: "admin"}, function(err, res){
              if(err){ throw err };
              callback();
-             });**/
+             });
         });
     };
     /*  ================================================================  */
