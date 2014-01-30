@@ -210,6 +210,7 @@ var SampleApp = function() {
                     });
         };
         self.routes['createGroup'] = function(req, res) {
+            req.session = {};
             console.log("creating group" + req.body);
             var groupInstance = new Group();
 
