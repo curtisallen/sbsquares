@@ -158,8 +158,8 @@ var SampleApp = function() {
             if (err) {
                 console.log("Error connecting ");
                 throw err
-            }
-            ;
+            };
+            console.log("Authenticating with: "+MONGODB_DB_USERNAME+", pword: "+MONGODB_DB_PASSWORD)
             self.db.authenticate(MONGODB_DB_USERNAME, MONGODB_DB_PASSWORD, {authdb: "admin"}, function(err, res){
              if(err){ throw err };
              if(callback){
