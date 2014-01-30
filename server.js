@@ -5,6 +5,7 @@ var fs = require('fs');
 var _ = require('underscore');
 //var mongodb = require('mongodb');
 var mongoose = require('./db').getMongoose();
+var MongoStore = require('connect-mongo')(express);
 
 /**
  *  Define the sample application.
@@ -22,8 +23,8 @@ var SampleApp = function() {
     var MONGODB_DB_PASSWORD = process.env.OPENSHIFT_MONGODB_DB_PASSWORD || '';
     var MONGODB_DB_NAME = "sbsquares";
 
-    //self.dbServer = new mongodb.Server(MONGODB_DB_HOST, parseInt(MONGODB_DB_PORT));
-    //self.db = new mongodb.Db(MONGODB_DB_NAME, self.dbServer, {auto_reconnect: true, w: 1});
+    self.dbServer = new mongodb.Server(MONGODB_DB_HOST, parseInt(MONGODB_DB_PORT));
+    self.db = new mongodb.Db(MONGODB_DB_NAME, self.dbServer, {auto_reconnect: true, w: 1});
 
 
     var IP = process.env.OPENSHIFT_INTERNAL_IP || '127.0.0.1';
@@ -152,22 +153,22 @@ var SampleApp = function() {
 
     // Logic to open a database connection. We are going to call this outside of app so it is available to all our functions inside.
 
-    self.connectDb = function(callback) {
-        console.log("Connecting to db");
-        self.db.open(function(err, db) {
-            if (err) {
-                console.log("Error connecting ");
-                throw err
-            };
-            console.log("Authenticating with: "+MONGODB_DB_USERNAME+", pword: "+MONGODB_DB_PASSWORD)
-            db.authenticate(MONGODB_DB_USERNAME, MONGODB_DB_PASSWORD, {authdb: "admin"}, function(err, res){
-             if(err){ console.log("AUTH error: "+JSON.stringify(err));throw err };
-             if(callback){
-                callback();
-             }
-             });
-        });
-    };
+    // self.connectDb = function(callback) {
+    //     console.log("Connecting to db");
+    //     self.db.open(function(err, db) {
+    //         if (err) {
+    //             console.log("Error connecting ");
+    //             throw err
+    //         };
+    //         //console.log("Authenticating with: "+MONGODB_DB_USERNAME+", pword: "+MONGODB_DB_PASSWORD)
+    //         // db.authenticate(MONGODB_DB_USERNAME, MONGODB_DB_PASSWORD, {authdb: "admin"}, function(err, res){
+    //         //  if(err){ console.log("AUTH error: "+JSON.stringify(err));throw err };
+    //         //  if(callback){
+    //         //     callback();
+    //         //  }
+    //         //  });
+    //     });
+    // };
     /*  ================================================================  */
     /*  App server functions (main app logic here).                       */
     /*  ================================================================  */
@@ -488,7 +489,13 @@ var SampleApp = function() {
         // conf
         self.app.use(express.bodyParser());
         self.app.use(express.cookieParser());
-        self.app.use(express.cookieSession({secret: '4265d78bcf30e9f7f9d3963adf982699'}));
+        self.app.use(express.session({
+            secret: '4265d78bcf30e9f7f9d3963adf982699',
+            store: new MongoStore({
+                      db: self.db
+                    })
+
+        }));
         // routes
         self.app.get('/', self.routes['/']);
         self.app.post('/createGroup', self.routes['createGroup']);
